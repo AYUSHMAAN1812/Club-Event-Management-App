@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "174972512312",
+    "project_id": "club-event-management-app",
+    "storage_bucket": "club-event-management-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:174972512312:android:0c450ed5eff2eba3359ecd",
+        "android_client_info": {
+          "package_name": "dev.maan.club_event_management"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNF300dPod0Rb2mCCo1wJ5EKM67YFlbHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

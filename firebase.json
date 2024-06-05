@@ -1,0 +1,25 @@
+{
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "club-event-management-app",
+                    "appId": "1:174972512312:android:0c450ed5eff2eba3359ecd",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "club-event-management-app",
+                    "configurations": {
+                        "android": "1:174972512312:android:0c450ed5eff2eba3359ecd",
+                        "ios": "1:174972512312:ios:692a2b0e1f7e52c5359ecd",
+                        "macos": "1:174972512312:ios:692a2b0e1f7e52c5359ecd",
+                        "web": "1:174972512312:web:37bdf2772c7de458359ecd",
+                        "windows": "1:174972512312:web:55f77b89ff0bdca7359ecd"
+                    }
+                }
+            }
+        }
+    }
+}
