@@ -15,9 +15,9 @@ void main() {
       ),
       home: const Homepage(),
       routes: {
-        loginUserRoute: (context) => const LoginUserView(),
-        loginAdminRoute: (context) => const LoginAdminView(),
-        registerUserRoute: (context) => const RegisterView(),
+        userLoginRoute: (context) => const LoginUserView(),
+        adminLoginRoute: (context) => const LoginAdminView(),
+        userRegisterRoute: (context) => const RegisterView(),
       },
     ),
   );
@@ -50,7 +50,7 @@ class Homepage extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    registerUserRoute,
+                    userRegisterRoute,
                     (route) => false,
                   );
                 },
@@ -66,7 +66,7 @@ class Homepage extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    loginUserRoute,
+                    userLoginRoute,
                     (route) => false,
                   );
                 },
@@ -82,7 +82,7 @@ class Homepage extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    loginAdminRoute,
+                    adminLoginRoute,
                     (route) => false,
                   );
                 },
@@ -94,4 +94,34 @@ class Homepage extends StatelessWidget {
       ),
     );
   }
+}
+
+
+Future<bool> showLogOutDialogBox(BuildContext context)
+{
+  return showDialog<bool>(
+    context: context, 
+    builder: (context)
+    {
+      return  AlertDialog(
+        title: const Text('Sign Out'),
+        content:const Text('Are you sure to sign out?'),
+        actions: [
+          TextButton(
+           onPressed: () {
+            Navigator.of(context).pop(false);
+           },
+           child:  const Text('Cancel'),
+           ),
+          TextButton(
+           onPressed: () {
+            Navigator.of(context).pop(true);
+
+           },
+           child: const Text('Log Out'),
+           ),
+        ],
+      );
+    }
+    ).then((value)=>value ?? false);
 }

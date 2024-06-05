@@ -1,6 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:club_event_management/constants/routes.dart';
+import 'package:club_event_management/services/auth/auth_exceptions.dart';
+import 'package:club_event_management/services/auth/auth_service.dart';
+import 'package:club_event_management/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class LoginUserView extends StatefulWidget {
   const LoginUserView({super.key});
@@ -52,11 +54,60 @@ class _LoginUserViewState extends State<LoginUserView> {
             ),
           ),
           TextButton(
-            onPressed: () async{
+            onPressed: () async {
               final email = _email.text;
               final password = _password.text;
+              try {
+                await AuthService.firebase().logIn(
+                  email: email,
+                  password: password,
+                );
+                final user = AuthService.firebase().currentUser;
+                if (user?.isEmailVerified ?? false) {
+                  // user's email is verified
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    notesRoute,
+                    (route) => false,
+                  );
+                } else {
+                  // user's email is not verified
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmailRoute,
+                    (route) => false,
+                  );
+                }
+              } on UserNotFoundAuthException {
+                await showErrorDialog(
+                  // ignore: use_build_context_synchronously
+                  context,
+                  'User Not Found',
+                );
+              } on WrongPasswordAuthException {
+                await showErrorDialog(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    'Wrong Credentials',
+                  );
+              } on GenericAuthException {
+                await showErrorDialog(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    'Authentication Error',
+                  );
+              }
             },
-            child: const Text('LogIn'),
+            child: const Text('Login'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                userRegisterRoute,
+                (route) => false,
+              );
+            },
+            child: const Text("Not registered yet? Register here"),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
-const loginUserRoute = '/login_user/';
-const loginAdminRoute = '/login_admin/';
-const registerUserRoute = '/register_user/';
-// const verifyEmailRoute = '/verify-email/';
+const userLoginRoute = '/login_user/';
+const adminLoginRoute = '/login_admin/';
+const userRegisterRoute = '/register_user/';
+const notesRoute = '/notes/';
+const verifyEmailRoute = '/verify-email/';
