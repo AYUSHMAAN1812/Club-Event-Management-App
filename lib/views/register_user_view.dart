@@ -2,6 +2,8 @@ import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
+import 'package:club_event_management/views/user_events_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
@@ -9,6 +11,12 @@ class RegisterView extends StatefulWidget {
 
   @override
   State<RegisterView> createState() => _MyWidgetState();
+}
+var email;
+initializeUserToken() async {
+  await FirebaseMessaging.instance.getToken().then((token) {
+    userCollection.doc(email.toString()).set({'id':token});
+  });
 }
 
 class _MyWidgetState extends State<RegisterView> {
@@ -59,7 +67,7 @@ class _MyWidgetState extends State<RegisterView> {
           ),
           TextButton(
             onPressed: () async {
-              final email = _email.text;
+              email = _email.text;
               final password = _password.text;
               try {
                 await AuthService.firebase().createUser(email: email, password: password,);
@@ -84,6 +92,7 @@ class _MyWidgetState extends State<RegisterView> {
             },
             child: const Text('Register'),
           ),
+          initializeUserToken(),
           TextButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(

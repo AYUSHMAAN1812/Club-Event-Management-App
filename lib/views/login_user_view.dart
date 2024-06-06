@@ -32,6 +32,11 @@ class _LoginUserViewState extends State<LoginUserView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login as User'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         children: [
           const Text('Log In'),
@@ -67,7 +72,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                   // user's email is verified
                   // ignore: use_build_context_synchronously
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
+                    userEventsRoute,
                     (route) => false,
                   );
                 } else {

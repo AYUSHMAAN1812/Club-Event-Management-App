@@ -32,6 +32,11 @@ class _LoginAdminViewState extends State<LoginAdminView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login as Admin'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         children: [
           const Text('Log In'),
@@ -65,14 +70,12 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                 final admin = AuthService.firebase().currentUser;
                 if (admin?.isEmailVerified ?? false) {
                   // admin's email is verified
-                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
+                    adminEventsRoute,
                     (route) => false,
                   );
                 } else {
                   // admin's email is not verified
-                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     verifyEmailRoute,
                     (route) => false,
@@ -80,19 +83,16 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                 }
               } on UserNotFoundAuthException {
                 await showErrorDialog(
-                  // ignore: use_build_context_synchronously
                   context,
                   'User Not Found',
                 );
               } on WrongPasswordAuthException {
                 await showErrorDialog(
-                    // ignore: use_build_context_synchronously
                     context,
                     'Wrong Credentials',
                   );
               } on GenericAuthException {
                 await showErrorDialog(
-                    // ignore: use_build_context_synchronously
                     context,
                     'Authentication Error',
                   );
