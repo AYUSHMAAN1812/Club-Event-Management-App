@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:club_event_management/event_model.dart';
+import 'package:club_event_management/main.dart';
 import 'package:club_event_management/views/user_events_page.dart';
 import 'package:flutter/material.dart';
 import '../helper_functions.dart';
@@ -25,9 +26,38 @@ class _EventDetailsState extends State<EventDetails> {
 
     const txtHeader = Center(
         child: Text("Event Details", style: TextStyle(fontSize: 24.0)));
-
-    
-
+    final completedBtn = Material(
+        elevation: 5.0,
+        borderRadius: BorderRadius.circular(15),
+        color: widget.event.status == "ongoing"
+            ? Colors.grey
+            : Homepage.primaryColor,
+        child: MaterialButton(
+          minWidth: MediaQuery.of(context).size.width,
+          onPressed: () => widget.event.status == "ongoing"
+              ? null
+              : completedEvent(widget.event, editEvent),
+          child: const Text(
+            "Completed",
+            style: TextStyle(color: Colors.white),
+          ),
+        ));
+    final ongoingBtn = Material(
+        elevation: 5.0,
+        borderRadius: BorderRadius.circular(15),
+        color: widget.event.status == "ongoing"
+            ? Colors.grey
+            : Homepage.primaryColor,
+        child: MaterialButton(
+          minWidth: MediaQuery.of(context).size.width,
+          onPressed: () => widget.event.status == "ongoing"
+              ? null
+              : ongoingEvent(widget.event, editEvent),
+          child: const Text(
+            "Ongoing",
+            style: TextStyle(color: Colors.white),
+          ),
+        ));
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -42,15 +72,33 @@ class _EventDetailsState extends State<EventDetails> {
               title: "Time", details: "${getTime(widget.event.time)}"),
           BuildRow(title: "Status", details: widget.event.status),
           const SizedBox(height: 20.0),
+          Row(
+            children: [
+              ongoingBtn,
+              completedBtn,
+            ],
+          )
         ]),
       ),
     );
   }
 }
 
-confirmAppointment(
+completedEvent(
     Event event, ValueChanged<Event> update) async {
-  event.status = "confirmed";
+  event.status = "completed";
+
+  await eventCollection
+      .doc(event.id)
+      .set(event.toJson())
+      .then((value) {
+    sendNotificationToUsers(event: event);
+    update(event);
+  });
+}
+ongoingEvent(
+    Event event, ValueChanged<Event> update) async {
+  event.status = "ongoing";
 
   await eventCollection
       .doc(event.id)

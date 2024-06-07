@@ -2,24 +2,16 @@ import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
-import 'package:club_event_management/views/user_events_page.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
   @override
-  State<RegisterView> createState() => _MyWidgetState();
-}
-var email;
-initializeUserToken() async {
-  await FirebaseMessaging.instance.getToken().then((token) {
-    userCollection.doc(email.toString()).set({'id':token});
-  });
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _MyWidgetState extends State<RegisterView> {
+class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
@@ -67,32 +59,31 @@ class _MyWidgetState extends State<RegisterView> {
           ),
           TextButton(
             onPressed: () async {
-              email = _email.text;
+              final email = _email.text;
               final password = _password.text;
               try {
                 await AuthService.firebase().createUser(email: email, password: password,);
                 
-                AuthService.firebase().sendEmailVerification();
-                // ignore: use_build_context_synchronously
+                await AuthService.firebase().sendEmailVerification();
+                if(!mounted) return;
                 Navigator.of(context).pushNamed(verifyEmailRoute);
               } on WeakPasswordAuthException {
-                  // ignore: use_build_context_synchronously
+                  if(!mounted) return;
                   showErrorDialog(context,
                   'Weak Password',);
               } on EmailAlreadyInUseAuthException {
-                  // ignore: use_build_context_synchronously
+                  if(!mounted) return;
                   showErrorDialog(context, 'Email is already in use',);
               } on InvalidEmailAuthException {
-                // ignore: use_build_context_synchronously
+                if(!mounted) return;
                 showErrorDialog(context, 'Invalid Email',);
               } on GenericAuthException {
-                // ignore: use_build_context_synchronously
+                if(!mounted) return;
                 showErrorDialog(context, 'Failed To Register');
               }
             },
             child: const Text('Register'),
           ),
-          initializeUserToken(),
           TextButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(

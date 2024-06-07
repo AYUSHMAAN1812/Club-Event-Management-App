@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/event_model.dart';
 import 'package:club_event_management/views/login_admin_view.dart';

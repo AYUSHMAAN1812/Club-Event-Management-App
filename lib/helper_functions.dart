@@ -80,7 +80,7 @@ sendNotificationToUsers({required Event event}) async {
         .get()
         .then((snapshot) {
           if (snapshot.exists && snapshot.data() != null) {
-            token = snapshot['id'];
+            token = snapshot["user-token"];
           }
         });
 

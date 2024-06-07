@@ -2,6 +2,8 @@ import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
+import 'package:club_event_management/views/user_events_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class LoginUserView extends StatefulWidget {
@@ -10,7 +12,12 @@ class LoginUserView extends StatefulWidget {
   @override
   State<LoginUserView> createState() => _LoginUserViewState();
 }
-
+var email;
+initializeUserToken() async {
+  await FirebaseMessaging.instance.getToken().then((token) {
+    userCollection.doc(email.toString()).set({"user-token":token});
+  });
+}
 class _LoginUserViewState extends State<LoginUserView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
@@ -70,34 +77,34 @@ class _LoginUserViewState extends State<LoginUserView> {
                 final user = AuthService.firebase().currentUser;
                 if (user?.isEmailVerified ?? false) {
                   // user's email is verified
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  if(!mounted) return;
+                  await Navigator.of(context).pushNamedAndRemoveUntil(
                     userEventsRoute,
                     (route) => false,
                   );
                 } else {
                   // user's email is not verified
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  if(!mounted) return;
+                  await Navigator.of(context).pushNamedAndRemoveUntil(
                     verifyEmailRoute,
                     (route) => false,
                   );
                 }
               } on UserNotFoundAuthException {
+                if(!mounted) return;
                 await showErrorDialog(
-                  // ignore: use_build_context_synchronously
                   context,
                   'User Not Found',
                 );
               } on WrongPasswordAuthException {
+                if(!mounted) return;
                 await showErrorDialog(
-                    // ignore: use_build_context_synchronously
                     context,
                     'Wrong Credentials',
                   );
               } on GenericAuthException {
+                if(!mounted) return;
                 await showErrorDialog(
-                    // ignore: use_build_context_synchronously
                     context,
                     'Authentication Error',
                   );
@@ -105,6 +112,7 @@ class _LoginUserViewState extends State<LoginUserView> {
             },
             child: const Text('Login'),
           ),
+          initializeUserToken(),
           TextButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(

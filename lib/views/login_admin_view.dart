@@ -2,6 +2,8 @@ import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
+import 'package:club_event_management/views/user_events_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class LoginAdminView extends StatefulWidget {
@@ -10,7 +12,12 @@ class LoginAdminView extends StatefulWidget {
   @override
   State<LoginAdminView> createState() => _LoginAdminViewState();
 }
-
+var email;
+initializeUserToken() async {
+  await FirebaseMessaging.instance.getToken().then((token) {
+    userCollection.doc(email.toString()).set({"user-token":token});
+  });
+}
 class _LoginAdminViewState extends State<LoginAdminView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
@@ -70,28 +77,33 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                 final admin = AuthService.firebase().currentUser;
                 if (admin?.isEmailVerified ?? false) {
                   // admin's email is verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  if(!mounted) return;
+                  await Navigator.of(context).pushNamedAndRemoveUntil(
                     adminEventsRoute,
                     (route) => false,
                   );
                 } else {
                   // admin's email is not verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  if(!mounted) return;
+                  await Navigator.of(context).pushNamedAndRemoveUntil(
                     verifyEmailRoute,
                     (route) => false,
                   );
                 }
               } on UserNotFoundAuthException {
+                if(!mounted) return;
                 await showErrorDialog(
                   context,
                   'User Not Found',
                 );
               } on WrongPasswordAuthException {
+                if(!mounted) return;
                 await showErrorDialog(
                     context,
                     'Wrong Credentials',
                   );
               } on GenericAuthException {
+                if(!mounted) return;
                 await showErrorDialog(
                     context,
                     'Authentication Error',
@@ -100,6 +112,7 @@ class _LoginAdminViewState extends State<LoginAdminView> {
             },
             child: const Text('Login'),
           ),
+          initializeUserToken(),
         ],
       ),
     );
