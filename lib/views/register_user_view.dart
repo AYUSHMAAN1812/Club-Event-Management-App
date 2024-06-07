@@ -80,6 +80,13 @@ class _RegisterViewState extends State<RegisterView> {
               } on GenericAuthException {
                 if(!mounted) return;
                 showErrorDialog(context, 'Failed To Register');
+              }catch (e) {
+                print('Error: $e');
+                if (!mounted) return;
+                await showErrorDialog(
+                  context,
+                  'Error: $e',
+                );
               }
             },
             child: const Text('Register'),

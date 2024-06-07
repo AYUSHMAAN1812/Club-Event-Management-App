@@ -12,12 +12,7 @@ class LoginUserView extends StatefulWidget {
   @override
   State<LoginUserView> createState() => _LoginUserViewState();
 }
-var email;
-initializeUserToken() async {
-  await FirebaseMessaging.instance.getToken().then((token) {
-    userCollection.doc(email.toString()).set({"user-token":token});
-  });
-}
+
 class _LoginUserViewState extends State<LoginUserView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
@@ -35,7 +30,17 @@ class _LoginUserViewState extends State<LoginUserView> {
     _password.dispose();
     super.dispose();
   }
-
+  Future<void> initializeUserToken(String email) async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        userCollection.doc(email).set({"user-token": token});
+      }
+    } catch (e) {
+      if(!mounted) return;
+      showErrorDialog(context, 'Failed to get user token');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,11 +113,18 @@ class _LoginUserViewState extends State<LoginUserView> {
                     context,
                     'Authentication Error',
                   );
+              }catch (e) {
+                print('Error: $e');
+                if (!mounted) return;
+                await showErrorDialog(
+                  context,
+                  'Error: $e',
+                );
               }
             },
             child: const Text('Login'),
           ),
-          initializeUserToken(),
+          // initializeUserToken(),
           TextButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(

@@ -19,6 +19,7 @@ void main() {
       ),
       home:  const Homepage(),
       routes: {
+        homePage: (context) => const Homepage(),
         userLoginRoute: (context) => const LoginUserView(),
         adminLoginRoute: (context) => const LoginAdminView(),
         userRegisterRoute: (context) => const RegisterView(),
