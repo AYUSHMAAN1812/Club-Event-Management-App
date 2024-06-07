@@ -70,7 +70,7 @@ class _LoginUserViewState extends State<LoginUserView> {
               hintText: "Enter your password here",
             ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
@@ -82,40 +82,40 @@ class _LoginUserViewState extends State<LoginUserView> {
                 final user = AuthService.firebase().currentUser;
                 if (user?.isEmailVerified ?? false) {
                   // user's email is verified
-                  if(!mounted) return;
+                  if(!context.mounted) return;
                   await Navigator.of(context).pushNamedAndRemoveUntil(
                     userEventsRoute,
                     (route) => false,
                   );
                 } else {
                   // user's email is not verified
-                  if(!mounted) return;
+                  if(!context.mounted) return;
                   await Navigator.of(context).pushNamedAndRemoveUntil(
                     verifyEmailRoute,
                     (route) => false,
                   );
                 }
               } on UserNotFoundAuthException {
-                if(!mounted) return;
+                if(!context.mounted) return;
                 await showErrorDialog(
                   context,
                   'User Not Found',
                 );
               } on WrongPasswordAuthException {
-                if(!mounted) return;
+                if(!context.mounted) return;
                 await showErrorDialog(
                     context,
                     'Wrong Credentials',
                   );
               } on GenericAuthException {
-                if(!mounted) return;
+                if(!context.mounted) return;
                 await showErrorDialog(
                     context,
                     'Authentication Error',
                   );
               }catch (e) {
                 print('Error: $e');
-                if (!mounted) return;
+                if (!context.mounted) return;
                 await showErrorDialog(
                   context,
                   'Error: $e',
@@ -125,7 +125,7 @@ class _LoginUserViewState extends State<LoginUserView> {
             child: const Text('Login'),
           ),
           // initializeUserToken(),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(
                 userRegisterRoute,

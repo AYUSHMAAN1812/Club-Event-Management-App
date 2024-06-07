@@ -57,33 +57,44 @@ class _RegisterViewState extends State<RegisterView> {
               hintText: "Enter your password here",
             ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
               try {
-                await AuthService.firebase().createUser(email: email, password: password,);
-                
+                await AuthService.firebase().createUser(
+                  email: email,
+                  password: password,
+                );
+
                 await AuthService.firebase().sendEmailVerification();
-                if(!mounted) return;
-                Navigator.of(context).pushNamed(verifyEmailRoute);
+                if (!context.mounted) return;
+                await Navigator.of(context).pushNamed(verifyEmailRoute);
               } on WeakPasswordAuthException {
-                  if(!mounted) return;
-                  showErrorDialog(context,
-                  'Weak Password',);
+                if (!context.mounted) return;
+                showErrorDialog(
+                  context,
+                  'Weak Password',
+                );
               } on EmailAlreadyInUseAuthException {
-                  if(!mounted) return;
-                  showErrorDialog(context, 'Email is already in use',);
+                if (!context.mounted) return;
+                showErrorDialog(
+                  context,
+                  'Email is already in use',
+                );
               } on InvalidEmailAuthException {
-                if(!mounted) return;
-                showErrorDialog(context, 'Invalid Email',);
+                if (!context.mounted) return;
+                showErrorDialog(
+                  context,
+                  'Invalid Email',
+                );
               } on GenericAuthException {
-                if(!mounted) return;
+                if (!context.mounted) return;
                 showErrorDialog(context, 'Failed To Register');
-              }catch (e) {
+              } catch (e) {
                 print('Error: $e');
-                if (!mounted) return;
-                await showErrorDialog(
+                if (!context.mounted) return;
+                showErrorDialog(
                   context,
                   'Error: $e',
                 );
@@ -91,7 +102,7 @@ class _RegisterViewState extends State<RegisterView> {
             },
             child: const Text('Register'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(
                 userLoginRoute,
