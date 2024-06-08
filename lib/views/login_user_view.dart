@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
@@ -34,7 +35,9 @@ class _LoginUserViewState extends State<LoginUserView> {
     try {
       final token = await FirebaseMessaging.instance.getToken();
       if (token != null) {
-        userCollection.doc(email).set({"user-token": token});
+        await FirebaseFirestore.instance.collection('users').doc(email).set({
+          "user-token": token,
+        });
       }
     } catch (e) {
       if(!mounted) return;
@@ -81,6 +84,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                 final user = AuthService.firebase().currentUser;
                 if (user?.isEmailVerified ?? false) {
                   // user's email is verified
+                  await initializeUserToken(email);
                   if(!context.mounted) return;
                   await Navigator.of(context).pushNamed(
                     userEventsRoute,

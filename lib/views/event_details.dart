@@ -14,50 +14,67 @@ class EventDetails extends StatefulWidget {
 }
 
 class _EventDetailsState extends State<EventDetails> {
+  late Event _eventCopy;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventCopy = Event(
+      name: _eventCopy.name,
+      time: _eventCopy.time,
+      club: _eventCopy.club,
+      status: _eventCopy.status,
+      id: _eventCopy.id,
+    );
+  }
+
+  void editEvent(Event event)
+  {
+    setState(() {
+      _eventCopy.status = event.status;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    void editEvent(Event event) {
-      setState(() {
-        widget.event.status = event.status;
-      });
-    }
+    log(_eventCopy.status);
 
-    log(widget.event.status);
-
-    const txtHeader = Center(
-        child: Text("Event Details", style: TextStyle(fontSize: 24.0)));
+    const txtHeader =
+        Center(child: Text("Event Details", style: TextStyle(fontSize: 24.0)));
     final completedBtn = Material(
         elevation: 5.0,
         borderRadius: BorderRadius.circular(15),
-        color: widget.event.status == "ongoing"
+        color: _eventCopy.status == "completed"
             ? Colors.grey
             : Homepage.primaryColor,
         child: MaterialButton(
           minWidth: MediaQuery.of(context).size.width,
-          onPressed: () => widget.event.status == "ongoing"
+          onPressed: () => _eventCopy.status == "completed"
               ? null
-              : completedEvent(widget.event, editEvent),
+              : completedEvent(_eventCopy, editEvent),
           child: const Text(
             "Completed",
             style: TextStyle(color: Colors.white),
           ),
         ));
+
     final ongoingBtn = Material(
         elevation: 5.0,
         borderRadius: BorderRadius.circular(15),
-        color: widget.event.status == "ongoing"
+        color: _eventCopy.status == "ongoing"
             ? Colors.grey
             : Homepage.primaryColor,
         child: MaterialButton(
           minWidth: MediaQuery.of(context).size.width,
-          onPressed: () => widget.event.status == "ongoing"
+          onPressed: () => _eventCopy.status == "ongoing"
               ? null
-              : ongoingEvent(widget.event, editEvent),
+              : ongoingEvent(_eventCopy, editEvent),
           child: const Text(
             "Ongoing",
             style: TextStyle(color: Colors.white),
           ),
         ));
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -68,11 +85,11 @@ class _EventDetailsState extends State<EventDetails> {
           BuildRow(title: "Name", details: widget.event.name),
           BuildRow(title: "Club", details: widget.event.club),
           BuildRow(title: "Date", details: getDate(widget.event.time)),
-          BuildRow(
-              title: "Time", details: "${getTime(widget.event.time)}"),
-          BuildRow(title: "Status", details: widget.event.status),
+          BuildRow(title: "Time", details: "${getTime(widget.event.time)}"),
+          BuildRow(title: "Status", details: _eventCopy.status),
           const SizedBox(height: 20.0),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ongoingBtn,
               completedBtn,
@@ -84,26 +101,19 @@ class _EventDetailsState extends State<EventDetails> {
   }
 }
 
-completedEvent(
-    Event event, ValueChanged<Event> update) async {
+Future<void>completedEvent(Event event, ValueChanged<Event> update) async {
   event.status = "completed";
 
-  await eventCollection
-      .doc(event.id)
-      .set(event.toJson())
-      .then((value) {
+  await eventCollection.doc(event.id).set(event.toJson()).then((value) {
     sendNotificationToUsers(event: event);
     update(event);
   });
 }
-ongoingEvent(
-    Event event, ValueChanged<Event> update) async {
+
+Future<void>ongoingEvent(Event event, ValueChanged<Event> update) async {
   event.status = "ongoing";
 
-  await eventCollection
-      .doc(event.id)
-      .set(event.toJson())
-      .then((value) {
+  await eventCollection.doc(event.id).set(event.toJson()).then((value) {
     sendNotificationToUsers(event: event);
     update(event);
   });

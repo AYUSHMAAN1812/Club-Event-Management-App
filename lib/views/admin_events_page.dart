@@ -162,7 +162,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
                 "Say when",
                 style: TextStyle(
                     color: Homepage.primaryColor,
-                    decoration: TextDecoration.underline),
+                    ),
               ),
               SizedBox(width: 10.0),
               Icon(Icons.alarm, color: Homepage.primaryColor)
@@ -185,14 +185,20 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
                   time: time);
 
               //If Form is in Edit state, call updateEvent() on Button click if not, call bookSession()
-              !_editForm
-                  ? bookSession(event: event)
-                  : updateEvent(Event(
+              if(!_editForm){
+                  bookSession(event: event);
+              }else{
+
+                  updateEvent(Event(
                       name: _nameController.text,
                       club: _club!,
                       time: time,
                       status: "upcoming",
                       id: _editEventId));
+                  setState(() {
+                    _editForm = false;
+                  });
+              }
               setState(() {
                 _admin = _nameController.text;
                 _nameController.clear();
@@ -277,7 +283,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
   }
 }
 
-bookSession({required Event event}) async {
+Future<void>bookSession({required Event event}) async {
   final docRef = eventCollection.doc();
   event = Event(
       name: event.name,
@@ -294,16 +300,16 @@ bookSession({required Event event}) async {
   await sendNotificationToUsers(event: event);
 }
 
-void updateEvent(event) {
+Future<void> updateEvent(Event event) async {
   //Set updated data for selected event
   eventCollection.doc(event.id).set(event.toJson()).then(
       (value) => log("Event updated Successfully!"),
       onError: (e) => log("Error updating event: $e"));
 
-  _editForm = false;
+  // _editForm = false;
 }
 
-void deleteAppointment(event) {
+Future<void> deleteAppointment(event) async {
   //Delete selected event
   eventCollection.doc(event.id).delete().then(
       (value) => log("Event deleted successfully!"),
@@ -319,6 +325,7 @@ class GetMyEvents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
+      
         height: 300.0,
         child: StreamBuilder(
           stream: getMyEvents(admin),

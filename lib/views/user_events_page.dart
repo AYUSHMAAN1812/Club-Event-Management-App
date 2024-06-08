@@ -19,11 +19,7 @@ class UserEventsPage extends StatefulWidget {
 
 
 class _UserEventsPage extends State<UserEventsPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +88,7 @@ class Schedule extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (snapshot.data!.docs.isEmpty) {
+            if (!snapshot.hasData||snapshot.data!.docs.isEmpty) {
               return const SizedBox(
                 height: 300.0,
                 child: Center(
