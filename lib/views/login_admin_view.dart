@@ -54,7 +54,6 @@ class _LoginAdminViewState extends State<LoginAdminView> {
       ),
       body: Column(
         children: [
-          const Text('Log In'),
           TextField(
             controller: _email,
             keyboardType: TextInputType.emailAddress,

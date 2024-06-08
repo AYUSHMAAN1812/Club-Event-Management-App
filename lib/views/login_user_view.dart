@@ -51,7 +51,6 @@ class _LoginUserViewState extends State<LoginUserView> {
       ),
       body: Column(
         children: [
-          const Text('Log In'),
           TextField(
             controller: _email,
             keyboardType: TextInputType.emailAddress,
@@ -83,16 +82,14 @@ class _LoginUserViewState extends State<LoginUserView> {
                 if (user?.isEmailVerified ?? false) {
                   // user's email is verified
                   if(!context.mounted) return;
-                  await Navigator.of(context).pushNamedAndRemoveUntil(
+                  await Navigator.of(context).pushNamed(
                     userEventsRoute,
-                    (route) => false,
                   );
                 } else {
                   // user's email is not verified
                   if(!context.mounted) return;
-                  await Navigator.of(context).pushNamedAndRemoveUntil(
+                  await Navigator.of(context).pushNamed(
                     verifyEmailRoute,
-                    (route) => false,
                   );
                 }
               } on UserNotFoundAuthException {
@@ -127,9 +124,8 @@ class _LoginUserViewState extends State<LoginUserView> {
           // initializeUserToken(),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(
+              Navigator.of(context).pushNamed(
                 userRegisterRoute,
-                (route) => false,
               );
             },
             child: const Text("Not registered yet? Register here"),

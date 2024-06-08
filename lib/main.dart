@@ -1,32 +1,50 @@
 import 'dart:developer';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/event_model.dart';
+import 'package:club_event_management/views/admin_events_page.dart';
 import 'package:club_event_management/views/login_admin_view.dart';
 import 'package:club_event_management/views/login_user_view.dart';
 import 'package:club_event_management/views/register_user_view.dart';
+import 'package:club_event_management/views/user_events_page.dart';
+import 'package:club_event_management/views/verify_email_view.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MaterialApp(
+  await Firebase.initializeApp();
+  await setupFlutterNotifications();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade400),
         useMaterial3: true,
       ),
-      home:  const Homepage(),
+      home: const Homepage(),
       routes: {
         homePage: (context) => const Homepage(),
         userLoginRoute: (context) => const LoginUserView(),
         adminLoginRoute: (context) => const LoginAdminView(),
         userRegisterRoute: (context) => const RegisterView(),
+        verifyEmailRoute: (context) => const VerifyEmailView(),
+        userEventsRoute: (context) => const UserEventsPage(),
+        adminEventsRoute: (context) => const AdminEventsPage(),
       },
-    ),
-  );
+    );
+  }
 }
 
 class Homepage extends StatefulWidget {
@@ -115,19 +133,23 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  _mapMessageToUser(RemoteMessage message) {
+  Future<void> _mapMessageToUser(RemoteMessage message) async {
     Map<String, dynamic> json = message.data;
 
-    if (message.data['club'] != null) {
-      Event event = Event(
-          name: json['name'],
-          time: DateTime.parse(json['time']),
-          club: json['club'],
-          status: json['status'],
-          id: json['id']);
-      Navigator.of(context).pushNamed(eventDetails, arguments: event);
-    } else {
-      Navigator.of(context).pushNamed(userLoginRoute, arguments: json);
+    try {
+      if (message.data['club'] != null) {
+        Event event = Event(
+            name: json['name'],
+            time: DateTime.parse(json['time']),
+            club: json['club'],
+            status: json['status'],
+            id: json['id']);
+        Navigator.of(context).pushNamed(eventDetails, arguments: event);
+      } else {
+        Navigator.of(context).pushNamed(userLoginRoute, arguments: json);
+      }
+    } catch (e) {
+      log('Error processing message: $e');
     }
   }
 
@@ -159,9 +181,8 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  Navigator.of(context).pushNamed(
                     userRegisterRoute,
-                    (route) => false,
                   );
                 },
                 child: const Text('Register as a User'),
@@ -175,9 +196,8 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  Navigator.of(context).pushNamed(
                     userLoginRoute,
-                    (route) => false,
                   );
                 },
                 child: const Text('Login as a User'),
@@ -191,9 +211,8 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  Navigator.of(context).pushNamed(
                     adminLoginRoute,
-                    (route) => false,
                   );
                 },
                 child: const Text('Login as an Admin'),
@@ -229,4 +248,23 @@ Future<bool> showLogOutDialogBox(BuildContext context) {
           ],
         );
       }).then((value) => value ?? false);
+}
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+Future<void> setupFlutterNotifications() async {
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'schedular_channel',
+    'Schedular Notifications',
+    description: 'This channel is used for Schedular app notifications.',
+    importance: Importance.max,
+  );
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }

@@ -67,29 +67,29 @@ class _RegisterViewState extends State<RegisterView> {
                   password: password,
                 );
 
-                await AuthService.firebase().sendEmailVerification();
+                AuthService.firebase().sendEmailVerification();
                 if (!context.mounted) return;
-                await Navigator.of(context).pushNamed(verifyEmailRoute);
+                Navigator.of(context).pushNamed(verifyEmailRoute);
               } on WeakPasswordAuthException {
-                if (!context.mounted) return;
+                // if (!context.mounted) return;
                 showErrorDialog(
                   context,
                   'Weak Password',
                 );
               } on EmailAlreadyInUseAuthException {
-                if (!context.mounted) return;
+                // if (!context.mounted) return;
                 showErrorDialog(
                   context,
                   'Email is already in use',
                 );
               } on InvalidEmailAuthException {
-                if (!context.mounted) return;
+                // if (!context.mounted) return;
                 showErrorDialog(
                   context,
                   'Invalid Email',
                 );
               } on GenericAuthException {
-                if (!context.mounted) return;
+                // if (!context.mounted) return;
                 showErrorDialog(context, 'Failed To Register');
               } catch (e) {
                 print('Error: $e');
