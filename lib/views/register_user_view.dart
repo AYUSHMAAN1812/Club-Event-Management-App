@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
@@ -37,81 +38,67 @@ class _RegisterViewState extends State<RegisterView> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          TextField(
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: "Enter your email here",
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _email,
+              keyboardType: TextInputType.emailAddress,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Enter your email here",
+              ),
             ),
-          ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: "Enter your password here",
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Enter your password here",
+              ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                await AuthService.firebase().createUser(
-                  email: email,
-                  password: password,
-                );
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                try {
+                  await AuthService.firebase().createUser(
+                    email: email,
+                    password: password,
+                  );
 
-                AuthService.firebase().sendEmailVerification();
-                if (!context.mounted) return;
-                Navigator.of(context).pushNamed(verifyEmailRoute);
-              } on WeakPasswordAuthException {
-                // if (!context.mounted) return;
-                showErrorDialog(
-                  context,
-                  'Weak Password',
-                );
-              } on EmailAlreadyInUseAuthException {
-                // if (!context.mounted) return;
-                showErrorDialog(
-                  context,
-                  'Email is already in use',
-                );
-              } on InvalidEmailAuthException {
-                // if (!context.mounted) return;
-                showErrorDialog(
-                  context,
-                  'Invalid Email',
-                );
-              } on GenericAuthException {
-                // if (!context.mounted) return;
-                showErrorDialog(context, 'Failed To Register');
-              } catch (e) {
-                print('Error: $e');
-                if (!context.mounted) return;
-                showErrorDialog(
-                  context,
-                  'Error: $e',
-                );
-              }
-            },
-            child: const Text('Register'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                userLoginRoute,
-                (route) => false,
-              );
-            },
-            child: const Text("Already registered? Login here"),
-          ),
-        ],
+                  AuthService.firebase().sendEmailVerification();
+                  if (!context.mounted) return;
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
+                } on WeakPasswordAuthException {
+                  showErrorDialog(context, 'Weak Password');
+                } on EmailAlreadyInUseAuthException {
+                  showErrorDialog(context, 'Email is already in use');
+                } on InvalidEmailAuthException {
+                  showErrorDialog(context, 'Invalid Email');
+                } on GenericAuthException {
+                  showErrorDialog(context, 'Failed To Register');
+                } catch (e) {
+                  log('Error: $e');
+                  if (!context.mounted) return;
+                  showErrorDialog(context, 'Error: $e');
+                }
+              },
+              child: const Text('Register'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(userLoginRoute);
+              },
+              child: const Text("Already registered? Login here"),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -283,38 +283,40 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
   }
 }
 
-Future<void>bookSession({required Event event}) async {
+Future<void> bookSession({required Event event}) async {
   final docRef = eventCollection.doc();
   event = Event(
       name: event.name,
       time: event.time,
       club: event.club,
-      status: "pending",
+      status: "upcoming",
       id: docRef.id);
 
-  await docRef.set(event.toJson()).then(
-      (value) => log("Event booked successfully!"),
-      onError: (e) => log("Error booking event: $e"));
+  try{
+  await docRef.set(event.toJson());
+      log("Event booked successfully!");
+  } catch (e) {
+    log('Error booking event: $e');
+  }
 
-  //Send Notifcation to Admin after Booking Session
+  // Send Notification to Users after Booking Session
   await sendNotificationToUsers(event: event);
 }
 
 Future<void> updateEvent(Event event) async {
-  //Set updated data for selected event
-  eventCollection.doc(event.id).set(event.toJson()).then(
+  // Set updated data for selected event
+  await eventCollection.doc(event.id).set(event.toJson()).then(
       (value) => log("Event updated Successfully!"),
       onError: (e) => log("Error updating event: $e"));
-
-  // _editForm = false;
 }
 
-Future<void> deleteAppointment(event) async {
-  //Delete selected event
-  eventCollection.doc(event.id).delete().then(
+Future<void> deleteAppointment(Event event) async {
+  // Delete selected event
+  await eventCollection.doc(event.id).delete().then(
       (value) => log("Event deleted successfully!"),
-      onError: (e) => "Error deleting event: $e");
+      onError: (e) => log("Error deleting event: $e"));
 }
+
 
 class GetMyEvents extends StatelessWidget {
   final String admin;
@@ -380,35 +382,40 @@ getMyEvents(String admin) {
 class UserScheduleCard extends StatelessWidget {
   final Event event;
   final ValueChanged<Event> update;
+
   const UserScheduleCard(this.event, {required this.update, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Slidable(
-        startActionPane: ActionPane(
-          motion: const ScrollMotion(),
-          children: [
-            SlidableAction(
-              onPressed: (context) => update(event),
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              icon: Icons.edit,
-              label: 'Edit',
-            ),
-          ],
-        ),
-        endActionPane: ActionPane(
-          motion: const ScrollMotion(),
-          children: [
-            SlidableAction(
-              onPressed: (context) => deleteAppointment(event),
-              backgroundColor: const Color(0xFFFE4A49),
-              foregroundColor: Colors.white,
-              icon: Icons.delete,
-              label: 'Delete',
-            ),
-          ],
-        ),
-        child: ScheduleCard(event));
+      startActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) => update(event),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+            label: 'Edit',
+          ),
+        ],
+      ),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) => deleteAppointment(event),
+            backgroundColor: const Color(0xFFFE4A49),
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: 'Delete',
+          ),
+        ],
+      ),
+      child: ListTile(
+        title: Text(event.name),
+        subtitle: Text('${event.club} - ${event.time.toLocal()}'),
+      ),
+    );
   }
 }

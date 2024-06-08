@@ -1,31 +1,35 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Event {
-  final String name;
-  final DateTime time;
-  final String club;
+  String name;
+  String club;
   String status;
-  final String? id;
+  DateTime time;
+  String? id;
 
-  Event(
-      {required this.name, required this.time, required this.club, required this.status, this.id});
+  Event({
+    required this.name,
+    required this.club,
+    required this.status,
+    required this.time,
+    this.id,
+  });
 
-  factory Event.fromJson(Map<String, dynamic> json) {
-    return Event(
-        name: json['name'],
-        time: (json['time']).toDate(),
-        club: json['club'],
-        status: json['status'],
-        id: json['id']);
-  }
-  
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'club': club,
-      'time': Timestamp.fromDate(time),
       'status': status,
-      'id': id
+      'time': time.toIso8601String(),
+      'id': id,
     };
+  }
+
+  static Event fromJson(Map<String, dynamic> json) {
+    return Event(
+      name: json['name'],
+      club: json['club'],
+      status: json['status'],
+      time: DateTime.parse(json['time']),
+      id: json['id'],
+    );
   }
 }

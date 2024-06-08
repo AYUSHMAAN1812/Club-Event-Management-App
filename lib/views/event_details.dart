@@ -20,16 +20,15 @@ class _EventDetailsState extends State<EventDetails> {
   void initState() {
     super.initState();
     _eventCopy = Event(
-      name: _eventCopy.name,
-      time: _eventCopy.time,
-      club: _eventCopy.club,
-      status: _eventCopy.status,
-      id: _eventCopy.id,
+      name: widget.event.name,
+      time: widget.event.time,
+      club: widget.event.club,
+      status: widget.event.status,
+      id: widget.event.id,
     );
   }
 
-  void editEvent(Event event)
-  {
+  void editEvent(Event event) {
     setState(() {
       _eventCopy.status = event.status;
     });
@@ -49,9 +48,9 @@ class _EventDetailsState extends State<EventDetails> {
             : Homepage.primaryColor,
         child: MaterialButton(
           minWidth: MediaQuery.of(context).size.width,
-          onPressed: () => _eventCopy.status == "completed"
+          onPressed: _eventCopy.status == "completed"
               ? null
-              : completedEvent(_eventCopy, editEvent),
+              : () => completedEvent(_eventCopy, editEvent),
           child: const Text(
             "Completed",
             style: TextStyle(color: Colors.white),
@@ -66,9 +65,9 @@ class _EventDetailsState extends State<EventDetails> {
             : Homepage.primaryColor,
         child: MaterialButton(
           minWidth: MediaQuery.of(context).size.width,
-          onPressed: () => _eventCopy.status == "ongoing"
+          onPressed: _eventCopy.status == "ongoing"
               ? null
-              : ongoingEvent(_eventCopy, editEvent),
+              : () => ongoingEvent(_eventCopy, editEvent),
           child: const Text(
             "Ongoing",
             style: TextStyle(color: Colors.white),
@@ -85,7 +84,7 @@ class _EventDetailsState extends State<EventDetails> {
           BuildRow(title: "Name", details: widget.event.name),
           BuildRow(title: "Club", details: widget.event.club),
           BuildRow(title: "Date", details: getDate(widget.event.time)),
-          BuildRow(title: "Time", details: "${getTime(widget.event.time)}"),
+          BuildRow(title: "Time", details: getTime(widget.event.time)),
           BuildRow(title: "Status", details: _eventCopy.status),
           const SizedBox(height: 20.0),
           Row(
@@ -101,7 +100,7 @@ class _EventDetailsState extends State<EventDetails> {
   }
 }
 
-Future<void>completedEvent(Event event, ValueChanged<Event> update) async {
+Future<void> completedEvent(Event event, ValueChanged<Event> update) async {
   event.status = "completed";
 
   await eventCollection.doc(event.id).set(event.toJson()).then((value) {
@@ -110,7 +109,7 @@ Future<void>completedEvent(Event event, ValueChanged<Event> update) async {
   });
 }
 
-Future<void>ongoingEvent(Event event, ValueChanged<Event> update) async {
+Future<void> ongoingEvent(Event event, ValueChanged<Event> update) async {
   event.status = "ongoing";
 
   await eventCollection.doc(event.id).set(event.toJson()).then((value) {
@@ -120,9 +119,9 @@ Future<void>ongoingEvent(Event event, ValueChanged<Event> update) async {
 }
 
 class BuildRow extends StatelessWidget {
-  final title;
-  final details;
-  const BuildRow({this.title, this.details, super.key});
+  final String title;
+  final String details;
+  const BuildRow({required this.title, required this.details, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +131,7 @@ class BuildRow extends StatelessWidget {
         children: [
           Text("$title:", style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 10.0),
-          Text("$details"),
+          Text(details),
         ],
       ),
     );

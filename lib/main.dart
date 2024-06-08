@@ -21,8 +21,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  
-  
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +57,14 @@ class _HomepageState extends State<Homepage> {
   Future<void> setUpInteractedMessage() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    ///Configure notification permissions
-    //IOS
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    // Configure notification permissions for iOS
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true, // Required to display a heads up notification
       badge: true,
       sound: true,
     );
 
-    //Android
+    // Request permissions for Android
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       announcement: false,
@@ -81,54 +77,38 @@ class _HomepageState extends State<Homepage> {
 
     log('User granted permission: ${settings.authorizationStatus}');
 
-    //Get the message from tapping on the notification when app is not in foreground
+    // Get the message from tapping on the notification when app is not in foreground
     RemoteMessage? initialMessage = await messaging.getInitialMessage();
 
-    //If the message contains a club, navigate to the admin
+    // If the message contains a club, navigate to the admin
     if (initialMessage != null) {
       await _mapMessageToUser(initialMessage);
     }
 
-    //This listens for messages when app is in background
+    // This listens for messages when app is in background
     FirebaseMessaging.onMessageOpenedApp.listen(_mapMessageToUser);
 
-    //Listen to messages in Foreground
+    // Listen to messages in Foreground
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
-      //Initialize FlutterLocalNotifications
-      final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-          FlutterLocalNotificationsPlugin();
-
-      const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        'schedular_channel', // id
-        'Schedular Notifications', // title
-        description:
-            'This channel is used for Schedular app notifications.', // description
-        importance: Importance.max,
-      );
-
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
-
-      //Construct local notification using our created channel
+      // Initialize FlutterLocalNotifications
       if (notification != null && android != null) {
         flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channelDescription: channel.description,
-                icon: "@mipmap/ic_launcher", //Your app icon goes here
-                // other properties...
-              ),
-            ));
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'events_channel',
+              'Events Notifications',
+              channelDescription: 'This channel is used for Events app notifications.',
+              icon: "@mipmap/ic_launcher",
+              importance: Importance.max,
+            ),
+          ),
+        );
       }
     });
   }
@@ -139,11 +119,12 @@ class _HomepageState extends State<Homepage> {
     try {
       if (message.data['club'] != null) {
         Event event = Event(
-            name: json['name'],
-            time: DateTime.parse(json['time']),
-            club: json['club'],
-            status: json['status'],
-            id: json['id']);
+          name: json['name'],
+          time: DateTime.parse(json['time']),
+          club: json['club'],
+          status: json['status'],
+          id: json['id'],
+        );
         Navigator.of(context).pushNamed(eventDetails, arguments: event);
       } else {
         Navigator.of(context).pushNamed(userLoginRoute, arguments: json);
@@ -161,64 +142,62 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.orange.shade100,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'CLUBS OF IITH',
-                style: TextStyle(color: Colors.green, fontSize: 40),
-              ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
-                  backgroundColor: Colors.orange.shade300,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
+    return Scaffold(
+      backgroundColor: Colors.orange.shade100,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'CLUBS OF IITH',
+              style: TextStyle(color: Colors.green, fontSize: 40),
+            ),
+            ElevatedButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+                backgroundColor: Colors.orange.shade300,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    userRegisterRoute,
-                  );
-                },
-                child: const Text('Register as a User'),
               ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
-                  backgroundColor: Colors.orange.shade300,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  userRegisterRoute,
+                );
+              },
+              child: const Text('Register as a User'),
+            ),
+            ElevatedButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+                backgroundColor: Colors.orange.shade300,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    userLoginRoute,
-                  );
-                },
-                child: const Text('Login as a User'),
               ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
-                  backgroundColor: Colors.orange.shade300,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  userLoginRoute,
+                );
+              },
+              child: const Text('Login as a User'),
+            ),
+            ElevatedButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+                backgroundColor: Colors.orange.shade300,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    adminLoginRoute,
-                  );
-                },
-                child: const Text('Login as an Admin'),
               ),
-            ],
-          ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  adminLoginRoute,
+                );
+              },
+              child: const Text('Login as an Admin'),
+            ),
+          ],
         ),
       ),
     );
@@ -227,36 +206,37 @@ class _HomepageState extends State<Homepage> {
 
 Future<bool> showLogOutDialogBox(BuildContext context) {
   return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Sign Out'),
-          content: const Text('Are you sure to sign out?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Log Out'),
-            ),
-          ],
-        );
-      }).then((value) => value ?? false);
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Log Out'),
+          ),
+        ],
+      );
+    },
+  ).then((value) => value ?? false);
 }
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> setupFlutterNotifications() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'schedular_channel',
-    'Schedular Notifications',
-    description: 'This channel is used for Schedular app notifications.',
+    'events_channel',
+    'Events Notifications',
+    description: 'This channel is used for Events app notifications.',
     importance: Importance.max,
   );
 
