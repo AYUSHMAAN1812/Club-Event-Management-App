@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:club_event_management/event_model.dart';
-import 'package:club_event_management/main.dart';
 import 'package:club_event_management/views/user_events_page.dart';
 import 'package:flutter/material.dart';
 import '../helper_functions.dart';
@@ -40,39 +39,9 @@ class _EventDetailsState extends State<EventDetails> {
 
     const txtHeader =
         Center(child: Text("Event Details", style: TextStyle(fontSize: 24.0)));
-    final completedBtn = Material(
-        elevation: 5.0,
-        borderRadius: BorderRadius.circular(15),
-        color: _eventCopy.status == "completed"
-            ? Colors.grey
-            : Homepage.primaryColor,
-        child: MaterialButton(
-          minWidth: MediaQuery.of(context).size.width,
-          onPressed: _eventCopy.status == "completed"
-              ? null
-              : () => completedEvent(_eventCopy, editEvent),
-          child: const Text(
-            "Completed",
-            style: TextStyle(color: Colors.white),
-          ),
-        ));
+    
 
-    final ongoingBtn = Material(
-        elevation: 5.0,
-        borderRadius: BorderRadius.circular(15),
-        color: _eventCopy.status == "ongoing"
-            ? Colors.grey
-            : Homepage.primaryColor,
-        child: MaterialButton(
-          minWidth: MediaQuery.of(context).size.width,
-          onPressed: _eventCopy.status == "ongoing"
-              ? null
-              : () => ongoingEvent(_eventCopy, editEvent),
-          child: const Text(
-            "Ongoing",
-            style: TextStyle(color: Colors.white),
-          ),
-        ));
+    
 
     return Scaffold(
       appBar: AppBar(),
@@ -87,13 +56,7 @@ class _EventDetailsState extends State<EventDetails> {
           BuildRow(title: "Time", details: getTime(widget.event.time)),
           BuildRow(title: "Status", details: _eventCopy.status),
           const SizedBox(height: 20.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ongoingBtn,
-              completedBtn,
-            ],
-          )
+          
         ]),
       ),
     );

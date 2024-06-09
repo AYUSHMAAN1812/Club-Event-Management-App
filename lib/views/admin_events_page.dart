@@ -284,7 +284,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
       ),
     );
 
-    void editAppointment(Event event) {
+    void editEvent(Event event) {
       setState(() {
         _nameController.text = event.name;
         _club = event.club;
@@ -328,7 +328,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
                 ],
               ),
               const SizedBox(height: 20.0),
-              GetMyEvents(admin: _admin ?? "", update: editAppointment),
+              GetMyEvents(admin: _admin ?? "", update: editEvent),
             ],
           ),
         ),
@@ -366,7 +366,7 @@ Future<void> updateEvent(Event event) async {
   }
 }
 
-Future<void> deleteAppointment(Event event) async {
+Future<void> deleteEvent(Event event) async {
   try {
     await eventCollection.doc(event.id).delete();
     log("Event deleted successfully!");
@@ -456,7 +456,7 @@ class UserScheduleCard extends StatelessWidget {
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) => deleteAppointment(event),
+            onPressed: (context) => deleteEvent(event),
             backgroundColor: const Color(0xFFFE4A49),
             foregroundColor: Colors.white,
             icon: Icons.delete,

@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/event_model.dart';
 import 'package:club_event_management/views/admin_events_page.dart';
+import 'package:club_event_management/views/event_details.dart';
 import 'package:club_event_management/views/login_admin_view.dart';
 import 'package:club_event_management/views/login_user_view.dart';
 import 'package:club_event_management/views/register_user_view.dart';
@@ -41,6 +42,15 @@ class MyApp extends StatelessWidget {
         userEventsRoute: (context) => const UserEventsPage(),
         adminEventsRoute: (context) => const AdminEventsPage(),
       },
+      onGenerateRoute: (settings) {
+        if (settings.name == eventDetails) {
+          final event = settings.arguments as Event;
+          return MaterialPageRoute(
+            builder: (context) => EventDetails(event),
+          );
+        }
+        return null;
+      },
     );
   }
 }
@@ -58,7 +68,8 @@ class _HomepageState extends State<Homepage> {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     // Configure notification permissions for iOS
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
       alert: true, // Required to display a heads up notification
       badge: true,
       sound: true,
@@ -103,7 +114,8 @@ class _HomepageState extends State<Homepage> {
             android: AndroidNotificationDetails(
               'events_channel',
               'Events Notifications',
-              channelDescription: 'This channel is used for Events app notifications.',
+              channelDescription:
+                  'This channel is used for Events app notifications.',
               icon: "@mipmap/ic_launcher",
               importance: Importance.max,
             ),
@@ -230,7 +242,8 @@ Future<bool> showLogOutDialogBox(BuildContext context) {
   ).then((value) => value ?? false);
 }
 
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> setupFlutterNotifications() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -241,10 +254,13 @@ Future<void> setupFlutterNotifications() async {
   );
 
   await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
