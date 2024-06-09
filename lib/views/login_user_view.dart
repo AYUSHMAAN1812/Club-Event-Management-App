@@ -34,19 +34,20 @@ class _LoginUserViewState extends State<LoginUserView> {
     super.dispose();
   }
 
-  Future<void> initializeUserToken(String email) async {
-    try {
-      final token = await FirebaseMessaging.instance.getToken();
-      if (token != null) {
-        await FirebaseFirestore.instance.collection('users').doc(email).set({
-          "user-token": token,
-        }, SetOptions(merge: true));
-      }
-    } catch (e) {
-      if (!mounted) return;
-      showErrorDialog(context, 'Failed to get user token');
+Future<void> initializeUserToken(String email) async {
+  try {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await FirebaseFirestore.instance.collection('users').doc(email).set({
+        "fcmToken": token,
+      }, SetOptions(merge: true));
     }
+  } catch (e) {
+    if (!mounted) return;
+    showErrorDialog(context, 'Failed to get user token');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
