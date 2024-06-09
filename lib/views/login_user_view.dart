@@ -51,6 +51,7 @@ class _LoginUserViewState extends State<LoginUserView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Login as User'),
           backgroundColor: Homepage.primaryColor,
