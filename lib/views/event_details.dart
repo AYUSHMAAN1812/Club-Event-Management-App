@@ -39,9 +39,7 @@ class _EventDetailsState extends State<EventDetails> {
 
     const txtHeader =
         Center(child: Text("Event Details", style: TextStyle(fontSize: 24.0)));
-    
 
-    
 
     return Scaffold(
       appBar: AppBar(),
@@ -64,7 +62,7 @@ class _EventDetailsState extends State<EventDetails> {
 }
 
 Future<void> completedEvent(Event event, ValueChanged<Event> update) async {
-  event.status = "completed";
+  event.status = "Completed";
 
   await eventCollection.doc(event.id).set(event.toJson()).then((value) {
     sendNotificationToUsers(event: event);
@@ -73,7 +71,7 @@ Future<void> completedEvent(Event event, ValueChanged<Event> update) async {
 }
 
 Future<void> ongoingEvent(Event event, ValueChanged<Event> update) async {
-  event.status = "ongoing";
+  event.status = "Ongoing";
 
   await eventCollection.doc(event.id).set(event.toJson()).then((value) {
     sendNotificationToUsers(event: event);

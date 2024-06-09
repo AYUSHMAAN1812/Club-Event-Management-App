@@ -1,22 +1,21 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+
 admin.initializeApp();
 
 exports.sendNotificationToUsers = functions.https.onCall(async (data, context) => {
-  const { tokens, title, body } = data;
-
-  const message = {
+  const tokens = data.tokens;
+  const payload = {
     notification: {
-      title: title,
-      body: body,
+      title: data.title,
+      body: data.body,
     },
-    tokens: tokens,
   };
 
   try {
-    const response = await admin.messaging().sendMulticast(message);
+    const response = await admin.messaging().sendToDevice(tokens, payload);
     return { success: true, response };
   } catch (error) {
-    return { success: false, error: error.message };
+    throw new functions.https.HttpsError('unknown', error.message, error);
   }
 });

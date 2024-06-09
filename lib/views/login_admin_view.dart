@@ -98,11 +98,13 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                         if (admin?.isEmailVerified ?? false) {
                           // admin's email is verified
                           if (!context.mounted) return;
-                          await Navigator.of(context).pushNamed(adminEventsRoute);
+                          await Navigator.of(context)
+                              .pushNamed(adminEventsRoute);
                         } else {
                           // admin's email is not verified
                           if (!context.mounted) return;
-                          await Navigator.of(context).pushNamed(verifyEmailRoute);
+                          await Navigator.of(context)
+                              .pushNamed(verifyEmailRoute);
                         }
                       } on UserNotFoundAuthException {
                         if (!context.mounted) return;

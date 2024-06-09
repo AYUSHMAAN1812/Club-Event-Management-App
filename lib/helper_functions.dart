@@ -49,19 +49,30 @@ String getDate(DateTime date) {
 
 // Send Event Notification To Users
 Future<void> sendNotificationToUsers({required Event event}) async {
-  // Retrieve all user tokens from Firestore
-  QuerySnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').get();
-  List<String> tokens = userSnapshot.docs
-      .map((doc) => doc['fcmToken'] as String?)
-      .where((token) => token != null)
-      .cast<String>()
-      .toList();
+  try {
+    // Retrieve all user tokens from Firestore
+    QuerySnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').get();
+    List<String> tokens = userSnapshot.docs
+        .map((doc) => doc["user-token"] as String?)
+        .where((token) => token != null)
+        .cast<String>()
+        .toList();
 
-  // Call Firebase Cloud Function
-  HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('sendNotificationToUsers');
-  await callable.call(<String, dynamic>{
-    'tokens': tokens,
-    'title': 'New Event: ${event.name}',
-    'body': 'Join us on ${getDate(event.time)} at ${getTime(event.time)} for an exciting event by ${event.club}!',
-  });
+    if (tokens.isEmpty) {
+      print('No user tokens found.');
+      return;
+    }
+
+    // Call Firebase Cloud Function
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('sendNotificationToUsers');
+    final result = await callable.call(<String, dynamic>{
+      'tokens': tokens,
+      'title': 'New Event: ${event.name}',
+      'body': 'Join us on ${getDate(event.time)} at ${getTime(event.time)} for an exciting event by ${event.club}!',
+    });
+
+    print('Notification sent successfully: ${result.data}');
+  } catch (e) {
+    print('Error sending notification: $e');
+  }
 }

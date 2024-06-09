@@ -34,25 +34,24 @@ class _LoginUserViewState extends State<LoginUserView> {
     super.dispose();
   }
 
-Future<void> initializeUserToken(String email) async {
-  try {
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) {
-      await FirebaseFirestore.instance.collection('users').doc(email).set({
-        "fcmToken": token,
-      }, SetOptions(merge: true));
+  Future<void> initializeUserToken(String email) async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        await FirebaseFirestore.instance.collection('users').doc(email).set({
+          "user-token": token,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showErrorDialog(context, 'Failed to get user token');
     }
-  } catch (e) {
-    if (!mounted) return;
-    showErrorDialog(context, 'Failed to get user token');
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Login as User'),
           backgroundColor: Homepage.primaryColor,
@@ -105,7 +104,8 @@ Future<void> initializeUserToken(String email) async {
                         fontSize: 15, // Font size
                         fontFamily: 'Roboto', // Font family
                         fontWeight: FontWeight.bold, // Font weight
-                      ), backgroundColor: Colors.orange,
+                      ),
+                      backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
                     ),
                     onPressed: _isLoading

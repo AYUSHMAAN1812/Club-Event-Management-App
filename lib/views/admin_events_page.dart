@@ -364,6 +364,7 @@ Future<void> updateEvent(Event event) async {
   } catch (e) {
     log("Error updating event: $e");
   }
+  await sendNotificationToUsers(event: event);
 }
 
 Future<void> deleteEvent(Event event) async {
@@ -373,6 +374,7 @@ Future<void> deleteEvent(Event event) async {
   } catch (e) {
     log("Error deleting event: $e");
   }
+  await sendNotificationToUsers(event: event);
 }
 
 class GetMyEvents extends StatelessWidget {
