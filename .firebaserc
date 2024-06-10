@@ -1,6 +1,7 @@
 {
   "projects": {
-    "club-event-management-app": "club-event-management-app"
+    "club-event-management-app": "club-event-management-app",
+    "default": "club-event-management-app"
   },
   "targets": {},
   "etags": {},

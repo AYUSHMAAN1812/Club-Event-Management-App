@@ -64,6 +64,11 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  @override
+  void initState() {
+    super.initState();
+    setUpInteractedMessage();
+  }
   Future<void> setUpInteractedMessage() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -134,6 +139,8 @@ class _HomepageState extends State<Homepage> {
           name: json['name'],
           time: DateTime.parse(json['time']),
           club: json['club'],
+          description: json['description'],
+          organizer: json['organizer'],
           status: json['status'],
           id: json['id'],
         );
@@ -146,11 +153,6 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    setUpInteractedMessage();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,13 +163,14 @@ class _HomepageState extends State<Homepage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'CLUBS OF IITH',
-              style: TextStyle(color: Colors.green, fontSize: 40),
+              'EVENTS OF IITH',
+              style: TextStyle(color: Colors.green, fontSize: 40,),
+              
             ),
             ElevatedButton(
               style: TextButton.styleFrom(
                 foregroundColor: Colors.blue,
-                backgroundColor: Colors.orange.shade300,
+                backgroundColor: Colors.orange,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
@@ -182,7 +185,7 @@ class _HomepageState extends State<Homepage> {
             ElevatedButton(
               style: TextButton.styleFrom(
                 foregroundColor: Colors.blue,
-                backgroundColor: Colors.orange.shade300,
+                backgroundColor: Colors.orange,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
@@ -197,7 +200,7 @@ class _HomepageState extends State<Homepage> {
             ElevatedButton(
               style: TextButton.styleFrom(
                 foregroundColor: Colors.blue,
-                backgroundColor: Colors.orange.shade300,
+                backgroundColor: Colors.orange,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),

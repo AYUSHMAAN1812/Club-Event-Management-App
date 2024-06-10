@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:club_event_management/constants/routes.dart';
-import 'package:club_event_management/main.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
@@ -52,17 +51,18 @@ class _LoginUserViewState extends State<LoginUserView> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.purple.shade100,
         appBar: AppBar(
-          title: const Text('Login as User'),
-          backgroundColor: Homepage.primaryColor,
-          foregroundColor: Colors.blue,
+          // title: const Text('Login as User'),
+          backgroundColor: Colors.purple,
+          foregroundColor: Colors.white,
         ),
         body: Stack(
           children: [
             Container(
-              height: 400.0,
+              height: MediaQuery.of(context).size.height/2,
               decoration: const BoxDecoration(
-                  color: Homepage.primaryColor,
+                  color: Colors.purple,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.0),
                     bottomRight: Radius.circular(30.0),
@@ -75,7 +75,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                 children: [
                   const Text(
                     'Login As User',
-                    style: TextStyle(fontSize: 25.0),
+                    style: TextStyle(fontSize: 25.0, color: Colors.white),
                   ),
                   const SizedBox(height: 50.0),
                   TextField(
@@ -85,7 +85,9 @@ class _LoginUserViewState extends State<LoginUserView> {
                     autocorrect: false,
                     decoration: const InputDecoration(
                       hintText: "Enter your email here",
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
+                    style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 16.0),
                   TextField(
@@ -95,9 +97,11 @@ class _LoginUserViewState extends State<LoginUserView> {
                     autocorrect: false,
                     decoration: const InputDecoration(
                       hintText: "Enter your password here",
+                      hintStyle: TextStyle(color: Colors.white),
                     ),
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  const SizedBox(height: 100.0),
+                  const SizedBox(height: 80.0),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       textStyle: const TextStyle(
@@ -105,7 +109,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                         fontFamily: 'Roboto', // Font family
                         fontWeight: FontWeight.bold, // Font weight
                       ),
-                      backgroundColor: Colors.orange,
+                      backgroundColor: Colors.purple,
                       foregroundColor: Colors.white,
                     ),
                     onPressed: _isLoading
@@ -116,6 +120,15 @@ class _LoginUserViewState extends State<LoginUserView> {
                             });
                             final email = _email.text;
                             final password = _password.text;
+
+                            if (email.isEmpty || password.isEmpty) {
+                              showErrorDialog(
+                                  context, 'Please fill in both fields');
+                              setState(() {
+                                _isLoading = false;
+                              });
+                              return;
+                            }
                             try {
                               await AuthService.firebase().logIn(
                                 email: email,
@@ -124,7 +137,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                               final user = AuthService.firebase().currentUser;
                               if (user?.isEmailVerified ?? false) {
                                 // user's email is verified
-                                await initializeUserToken(email);
+
                                 if (!context.mounted) return;
                                 Navigator.of(context)
                                     .pushNamed(userEventsRoute);
@@ -171,7 +184,19 @@ class _LoginUserViewState extends State<LoginUserView> {
                           )
                         : const Text('Login'),
                   ),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      textStyle: const TextStyle(
+                        fontSize: 15, // Font size
+                        fontFamily: 'Roboto', // Font family
+                        fontWeight: FontWeight.bold, // Font weight
+                      ),
+                      backgroundColor: Colors.purple,
+                      foregroundColor: Colors.white,
+                    ),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
                         userRegisterRoute,

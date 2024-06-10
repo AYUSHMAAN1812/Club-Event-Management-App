@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/event_model.dart';
 import 'package:club_event_management/views/user_events_page.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class _EventDetailsState extends State<EventDetails> {
       name: widget.event.name,
       time: widget.event.time,
       club: widget.event.club,
+      description: widget.event.description,
+      organizer: widget.event.organizer,
       status: widget.event.status,
       id: widget.event.id,
     );
@@ -38,24 +41,57 @@ class _EventDetailsState extends State<EventDetails> {
     log(_eventCopy.status);
 
     const txtHeader =
-        Center(child: Text("Event Details", style: TextStyle(fontSize: 24.0)));
+        Center(child: Text("Event Details", style: TextStyle(fontSize: 24.0, color: Colors.white)));
 
 
     return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(children: [
-          txtHeader,
-          const SizedBox(height: 20.0),
-          BuildRow(title: "Name", details: widget.event.name),
-          BuildRow(title: "Club", details: widget.event.club),
-          BuildRow(title: "Date", details: getDate(widget.event.time)),
-          BuildRow(title: "Time", details: getTime(widget.event.time)),
-          BuildRow(title: "Status", details: _eventCopy.status),
-          const SizedBox(height: 20.0),
-          
-        ]),
+      backgroundColor: Colors.purple.shade100,
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.purple,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              await Navigator.of(context).pushNamedAndRemoveUntil(
+                homePage,
+                (route) => false,
+              );
+            },
+          )
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height/12,
+              decoration: const BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30.0),
+                    bottomRight: Radius.circular(30.0),
+                  )),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(children: [
+              txtHeader,
+              const SizedBox(height: 20.0),
+              BuildRow(title: "Name", details: widget.event.name),
+              BuildRow(title: "Club", details: widget.event.club),
+              BuildRow(title: "Description", details: widget.event.description),
+              BuildRow(title: "Organizer", details: widget.event.organizer),
+              BuildRow(title: "Date", details: getDate(widget.event.time)),
+              BuildRow(title: "Time", details: getTime(widget.event.time)),
+              BuildRow(title: "Status", details: _eventCopy.status),
+              const SizedBox(height: 20.0),
+              
+            ]),
+          ),
+        ],
       ),
     );
   }

@@ -1,8 +1,9 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/event_model.dart';
 import 'package:club_event_management/helper_functions.dart';
-import 'package:club_event_management/main.dart';
 import 'package:flutter/material.dart';
 
 final db = FirebaseFirestore.instance;
@@ -20,14 +21,32 @@ class _UserEventsPage extends State<UserEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(elevation: 0.0),
+      backgroundColor: Colors.purple.shade100,
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.purple,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              await Navigator.of(context).pushNamedAndRemoveUntil(
+                homePage,
+                (route) => false,
+              );
+            },
+          )
+        ],
+      ),
       body: SingleChildScrollView(
         child: Stack(
           children: [
             Container(
-              height: 130.0,
+              height: MediaQuery.of(context).size.height/6,
               decoration: const BoxDecoration(
-                  color: Homepage.primaryColor,
+                  color: Colors.purple,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.0),
                     bottomRight: Radius.circular(30.0),
@@ -48,7 +67,7 @@ class _UserEventsPage extends State<UserEventsPage> {
                     SizedBox(height: 10.0),
                     Text("Here are your upcoming events",
                         style: TextStyle(fontSize: 16.0, color: Colors.white)),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 40.0),
                     Schedule(),
                     SizedBox(height: 30.0),
                   ]),
@@ -75,12 +94,12 @@ class Schedule extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            print("Error: ${snapshot.error}"); // Debug print for error
+            log("Error: ${snapshot.error}"); // Debug log for error
             return Center(child: Text("Error: ${snapshot.error}"));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            print("No data or empty docs"); // Debug print for no data
+            log("No data or empty docs"); // Debug log for no data
             return const SizedBox(
               height: 300.0,
               child: Center(child: Text("You do not have any new events!")),
@@ -92,7 +111,7 @@ class Schedule extends StatelessWidget {
 
             for (var doc in snapshot.data!.docs) {
               final event = Event.fromJson(doc.data() as Map<String, dynamic>);
-              print(event); // Debug print for each event
+              print(event); // Debug log for each event
               events.add(event);
             }
             return SizedBox(
@@ -122,8 +141,8 @@ DateTime now = DateTime.now();
 DateTime today = DateTime(now.year, now.month, now.day);
 
 final Stream<QuerySnapshot> getEvents = eventCollection
-    .orderBy('time')
-    .where('time', isGreaterThanOrEqualTo: Timestamp.fromDate(today))
+    // .orderBy('time')
+    // .where('time', isGreaterThanOrEqualTo: Timestamp.fromDate(today))
     .snapshots();
 
 class ScheduleCard extends StatelessWidget {
@@ -133,23 +152,17 @@ class ScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50.0,
-      margin: const EdgeInsets.only(bottom: 10.0),
+      margin: const EdgeInsets.all(10.0),
 
       //width: MediaQuery.of(context).size.width,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
-          //Service color tag
-          Container(
-            width: 5.0,
-          ),
-
           Expanded(
             child: SizedBox(
               height: 50.0,
               child: Card(
-                elevation: 5.0,
+                elevation: 3.0,
                 margin: EdgeInsets.zero,
                 child: Padding(
                   padding:
@@ -167,6 +180,17 @@ class ScheduleCard extends StatelessWidget {
                                   children: [
                                     Text(event.name,
                                         overflow: TextOverflow.ellipsis),
+                                    Text(
+                                      event.status,
+                                      style: TextStyle(
+                                          fontSize: 12.0,
+                                          color: event.status == 'Upcoming'
+                                              ? Colors.red
+                                              : event.status == 'Ongoing'
+                                                  ? Colors.yellow
+                                                  : Colors.green,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ],
                                 )),
 
@@ -176,17 +200,7 @@ class ScheduleCard extends StatelessWidget {
                             //Event time
                             Text(getTime(event.time)),
                           ]),
-                      Text(
-                        event.status,
-                        style: TextStyle(
-                            fontSize: 12.0,
-                            color: event.status == 'Upcoming'
-                                ? Colors.red
-                                : event.status == 'Ongoing'
-                                    ? Colors.yellow
-                                    : Colors.green,
-                            fontWeight: FontWeight.bold),
-                      )
+                      
                     ],
                   ),
                 ),

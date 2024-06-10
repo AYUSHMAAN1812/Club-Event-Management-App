@@ -1,7 +1,8 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/event_model.dart';
-import 'package:club_event_management/main.dart';
+import 'package:club_event_management/utilities/show_error_dialog.dart';
 import 'package:club_event_management/views/user_events_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class AdminEventsPage extends StatefulWidget {
 }
 
 class _AdminEventsPageState extends State<AdminEventsPage> {
-  String? _admin;
+  String? _eventName;
   bool _editForm = false;
   String _editEventId = "";
 
@@ -31,6 +32,8 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
   final _statusList = ["Upcoming", "Ongoing", "Completed"];
 
   final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _organizerController = TextEditingController();
   final _searchController = TextEditingController();
 
   @override
@@ -41,6 +44,8 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _descriptionController.dispose();
+    _organizerController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -50,12 +55,12 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
     var args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
-      _admin = args['name'] ?? "";
+      _eventName = args['name'] ?? "";
     }
 
     final nameField = Container(
       decoration: BoxDecoration(
-        border: Border.all(width: 1.0, color: Colors.grey.shade300),
+        border: Border.all(width: 1.0, color: Colors.purple),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: TextFormField(
@@ -64,18 +69,58 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.next,
         decoration: const InputDecoration(
-          prefixIcon: Icon(Icons.person),
+          prefixIcon: Icon(Icons.event, color: Colors.purple,),
           contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: "Name",
+          hintStyle: TextStyle(color: Colors.purple),
           border: InputBorder.none,
         ),
+        style: const TextStyle(color: Colors.purple)
+      ),
+    );
+    final descriptionField = Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.purple),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: TextFormField(
+        autofocus: false,
+        controller: _descriptionController,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(Icons.description, color: Colors.purple,),
+          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: "Description",
+          hintStyle: TextStyle(color: Colors.purple),
+          border: InputBorder.none,
+        ),
+        style: const TextStyle(color: Colors.purple)
+      ),
+    );
+    final organizerField = Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.purple),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: TextFormField(
+        autofocus: false,
+        controller: _organizerController,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(Icons.person, color: Colors.purple,),
+          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: "Organizer",
+          hintStyle: TextStyle(color: Colors.purple),
+          border: InputBorder.none,
+        ),
+        style: const TextStyle(color: Colors.purple)
       ),
     );
 
     final searchField = Container(
       height: 50.0,
       decoration: BoxDecoration(
-        border: Border.all(width: 1.0, color: Colors.grey.shade300),
+        border: Border.all(width: 1.0, color: Colors.purple),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: TextFormField(
@@ -84,9 +129,11 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
         decoration: const InputDecoration(
           prefixIcon: Icon(Icons.search),
           contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Search for",
+          hintText: "Search for your events",
+          hintStyle: TextStyle(color: Colors.purple),
           border: InputBorder.none,
         ),
+        style: const TextStyle(color: Colors.purple)
       ),
     );
 
@@ -96,14 +143,15 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
           height: 50.0,
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           decoration: BoxDecoration(
-            border: Border.all(width: 1.0, color: Colors.grey.shade300),
+            border: Border.all(width: 1.0, color: Colors.purple),
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: DropdownButton<String>(
-            dropdownColor: Colors.white,
+            dropdownColor: Colors.purple,
             icon: const Icon(Icons.arrow_drop_down),
             iconSize: 28,
-            hint: const Text("Select club"),
+            iconEnabledColor: Colors.purple,
+            hint: const Text("Select club", style: TextStyle(color: Colors.purple),),
             disabledHint: const Text("Select club"),
             underline: const SizedBox(),
             isExpanded: true,
@@ -127,14 +175,15 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
           height: 50.0,
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           decoration: BoxDecoration(
-            border: Border.all(width: 1.0, color: Colors.grey.shade300),
+            border: Border.all(width: 1.0, color: Colors.purple),
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: DropdownButton<String>(
-            dropdownColor: Colors.white,
+            dropdownColor: Colors.purple,
             icon: const Icon(Icons.arrow_drop_down),
             iconSize: 28,
-            hint: const Text("Select status"),
+            iconEnabledColor: Colors.purple,
+            hint: const Text("Select status", style: TextStyle(color: Colors.purple),),
             disabledHint: const Text("Select status"),
             underline: const SizedBox(),
             isExpanded: true,
@@ -170,17 +219,17 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
       children: [
         Row(
           children: [
-            const Text("Date: ", style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text("Date: ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
             const SizedBox(width: 10.0),
-            Text(DateFormat('yyyy-MM-dd').format(time)),
+            Text(DateFormat('yyyy-MM-dd').format(time), style: const TextStyle(color: Colors.purple),),
           ],
         ),
         const SizedBox(height: 20.0),
         Row(
           children: [
-            const Text("Time: ", style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text("Time: ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
             const SizedBox(width: 10.0),
-            Text(DateFormat('HH:mm').format(time)),
+            Text(DateFormat('HH:mm').format(time), style: const TextStyle(color: Colors.purple),),
           ],
         ),
         const SizedBox(height: 15.0),
@@ -188,10 +237,10 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
     );
 
     const txtHeader =
-        Center(child: Text("Book Event", style: TextStyle(fontSize: 24.0)));
+        Center(child: Text("Book Event", style: TextStyle(color: Colors.white,fontSize: 24.0)));
 
     final btnShowDate = Material(
-      color: Colors.transparent,
+      color: Colors.purple.shade100,
       child: MaterialButton(
         padding: EdgeInsets.zero,
         onPressed: () {
@@ -205,11 +254,11 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
             Text(
               "Say when",
               style: TextStyle(
-                color: Homepage.primaryColor,
+                color: Colors.purple,
               ),
             ),
             SizedBox(width: 10.0),
-            Icon(Icons.alarm, color: Homepage.primaryColor)
+            Icon(Icons.alarm, color: Colors.purple)
           ],
         ),
       ),
@@ -218,15 +267,20 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
     final btnSubmit = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(15),
-      color: Homepage.primaryColor,
+      color: Colors.purple,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          if (_nameController.text.isNotEmpty && _club != null && _status != null) {
+          if (_nameController.text.isNotEmpty &&
+              _club != null &&
+              _status != null &&
+              _organizerController.text.isNotEmpty) {
             Event event = Event(
               name: _nameController.text,
               club: _club!,
               status: _status!,
+              description: _descriptionController.text,
+              organizer: _organizerController.text,
               time: time,
             );
 
@@ -237,6 +291,8 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
                 name: _nameController.text,
                 club: _club!,
                 status: _status!,
+                description: _descriptionController.text,
+                organizer: _organizerController.text,
                 time: time,
                 id: _editEventId,
               ));
@@ -245,17 +301,20 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
               });
             }
             setState(() {
-              _admin = _nameController.text;
+              _eventName = _nameController.text;
               _nameController.clear();
+              _descriptionController.clear();
+              _organizerController.clear();
               _club = null;
               _status = null;
               time = DateTime.now();
             });
           } else {
             log("Please enter all fields!");
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Please enter all fields!")),
-            );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   const SnackBar(content: Text("Please enter all fields!")),
+            // );
+            showErrorDialog(context, "Please enter all fields!");
           }
         },
         child: Text(
@@ -268,12 +327,12 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
     final btnSearch = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(15),
-      color: Homepage.primaryColor,
+      color: Colors.purple,
       child: MaterialButton(
         onPressed: () {
           if (_searchController.text.isNotEmpty) {
             setState(() {
-              _admin = _searchController.text;
+              _eventName = _searchController.text;
             });
           }
         },
@@ -289,6 +348,8 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
         _nameController.text = event.name;
         _club = event.club;
         _status = event.status;
+        _descriptionController.text = event.description;
+        _organizerController.text = event.organizer;
         time = event.time;
         _editForm = true;
         _editEventId = event.id!;
@@ -297,40 +358,76 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(),
+      backgroundColor: Colors.purple.shade100,
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.purple,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              await Navigator.of(context).pushNamedAndRemoveUntil(
+                homePage,
+                (route) => false,
+              );
+            },
+          )
+        ],
+      ),
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              txtHeader,
-              const SizedBox(height: 20.0),
-              nameField,
-              const SizedBox(height: 30.0),
-              clubDropDown,
-              const SizedBox(height: 30.0),
-              statusDropDown,
-              const SizedBox(height: 30.0),
-              selectedDateAndTime,
-              datePicker,
-              btnShowDate,
-              const SizedBox(height: 60.0),
-              btnSubmit,
-              const SizedBox(height: 20.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
+          
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height/13,
+              decoration: const BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30.0),
+                    bottomRight: Radius.circular(30.0),
+                  )),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: searchField),
-                  const SizedBox(width: 20.0),
-                  btnSearch
+                  txtHeader,
+                  const SizedBox(height: 20.0),
+                  nameField,
+                  const SizedBox(height: 30.0),
+                  clubDropDown,
+                  const SizedBox(height: 30.0),
+                  organizerField,
+                  const SizedBox(height: 30.0),
+                  descriptionField,
+                  const SizedBox(height: 30.0),
+                  statusDropDown,
+                  const SizedBox(height: 30.0),
+                  selectedDateAndTime,
+                  datePicker,
+                  btnShowDate,
+                  const SizedBox(height: 60.0),
+                  btnSubmit,
+                  const SizedBox(height: 20.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: searchField),
+                      const SizedBox(width: 20.0),
+                      btnSearch
+                    ],
+                  ),
+                  const SizedBox(height: 20.0),
+                  GetMyEvents(eventName: _eventName ?? "", update: editEvent),
                 ],
               ),
-              const SizedBox(height: 20.0),
-              GetMyEvents(admin: _admin ?? "", update: editEvent),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -343,6 +440,8 @@ Future<void> bookSession({required Event event}) async {
     name: event.name,
     time: event.time,
     club: event.club,
+    description: event.description,
+    organizer: event.organizer,
     status: event.status,
     id: docRef.id,
   );
@@ -378,16 +477,16 @@ Future<void> deleteEvent(Event event) async {
 }
 
 class GetMyEvents extends StatelessWidget {
-  final String admin;
+  final String eventName;
   final ValueChanged<Event> update;
-  const GetMyEvents({required this.admin, required this.update, super.key});
+  const GetMyEvents({required this.eventName, required this.update, super.key});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 300.0,
       child: StreamBuilder<QuerySnapshot>(
-        stream: getMyEvents(admin),
+        stream: getMyEvents(eventName),
         builder: ((context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -399,7 +498,7 @@ class GetMyEvents extends StatelessWidget {
 
           if (snapshot.data!.docs.isEmpty) {
             return const SizedBox(
-              child: Center(child: Text("You haven't booked any event yet!")),
+              child: Center(child: Text("You haven't booked any event yet!",style: TextStyle(color: Colors.purple),)),
             );
           }
 
@@ -426,11 +525,11 @@ class GetMyEvents extends StatelessWidget {
   }
 }
 
-Stream<QuerySnapshot> getMyEvents(String admin) {
-  if (admin.isEmpty) {
+Stream<QuerySnapshot> getMyEvents(String eventName) {
+  if (eventName.isEmpty) {
     return const Stream.empty();
   }
-  return eventCollection.where('name', isEqualTo: admin).snapshots();
+  return eventCollection.where('name', isEqualTo: eventName).snapshots();
 }
 
 class UserScheduleCard extends StatelessWidget {
@@ -467,8 +566,9 @@ class UserScheduleCard extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        title: Text(event.name),
-        subtitle: Text('${event.club} - ${event.time.toLocal()}'),
+        tileColor: Colors.purple,
+        title: Text(event.name, style: const TextStyle(color: Colors.white),),
+        subtitle: Text('${event.club} - ${event.time.toLocal()}', style: const TextStyle(color: Colors.white),),
       ),
     );
   }
