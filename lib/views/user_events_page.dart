@@ -185,9 +185,9 @@ class ScheduleCard extends StatelessWidget {
                                       style: TextStyle(
                                           fontSize: 12.0,
                                           color: event.status == 'Upcoming'
-                                              ? Colors.red
+                                              ? Colors.orange
                                               : event.status == 'Ongoing'
-                                                  ? Colors.yellow
+                                                  ? Colors.blue
                                                   : Colors.green,
                                           fontWeight: FontWeight.bold),
                                     )

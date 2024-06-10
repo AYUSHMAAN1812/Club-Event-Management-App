@@ -126,7 +126,7 @@ class BuildRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: Row(
         children: [
-          Text("$title:", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text("$title:", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
           const SizedBox(width: 10.0),
           Text(details),
         ],

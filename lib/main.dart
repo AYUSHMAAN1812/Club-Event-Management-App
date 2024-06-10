@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade400),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple.shade400),
         useMaterial3: true,
       ),
       home: const Homepage(),
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
-  static const primaryColor = Colors.orange;
+  static const primaryColor = Colors.white;
 
   @override
   State<Homepage> createState() => _HomepageState();
@@ -157,23 +157,25 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange.shade100,
+      backgroundColor: Colors.purple,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
               'EVENTS OF IITH',
-              style: TextStyle(color: Colors.green, fontSize: 40,),
+              style: TextStyle(color: Colors.white, fontSize: 40,),
               
             ),
+            const SizedBox(height: 50.0,),
             ElevatedButton(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue,
-                backgroundColor: Colors.orange,
+                foregroundColor: Colors.purple,
+                backgroundColor: Colors.white,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
+                textStyle: const TextStyle(fontSize: 20.0),
               ),
               onPressed: () {
                 Navigator.of(context).pushNamed(
@@ -182,13 +184,15 @@ class _HomepageState extends State<Homepage> {
               },
               child: const Text('Register as a User'),
             ),
+            const SizedBox(height: 50.0,),
             ElevatedButton(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue,
-                backgroundColor: Colors.orange,
+                foregroundColor: Colors.purple,
+                backgroundColor: Colors.white,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
+                textStyle: const TextStyle(fontSize: 20.0),
               ),
               onPressed: () {
                 Navigator.of(context).pushNamed(
@@ -197,13 +201,15 @@ class _HomepageState extends State<Homepage> {
               },
               child: const Text('Login as a User'),
             ),
+            const SizedBox(height: 50.0,),
             ElevatedButton(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue,
-                backgroundColor: Colors.orange,
+                foregroundColor: Colors.purple,
+                backgroundColor: Colors.white,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
+                textStyle: const TextStyle(fontSize: 20.0),
               ),
               onPressed: () {
                 Navigator.of(context).pushNamed(
