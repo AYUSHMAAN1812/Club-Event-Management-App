@@ -4,6 +4,7 @@ class Event {
   String status;
   String description;
   String organizer;
+  String venue;
   DateTime time;
   String? id;
 
@@ -13,6 +14,7 @@ class Event {
     required this.status,
     required this.description,
     required this.organizer,
+    required this.venue,
     required this.time,
     this.id,
   });
@@ -24,6 +26,7 @@ class Event {
       'status': status,
       'description': description,
       'organizer': organizer,
+      'venue': venue,
       'time': time.toIso8601String(),
       'id': id,
     };
@@ -36,6 +39,7 @@ class Event {
       status: json['status'],
       description: json['description'],
       organizer: json['organizer'],
+      venue: json['venue'],
       time: DateTime.parse(json['time']),
       id: json['id'],
     );

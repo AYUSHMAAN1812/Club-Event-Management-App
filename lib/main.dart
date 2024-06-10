@@ -141,6 +141,7 @@ class _HomepageState extends State<Homepage> {
           club: json['club'],
           description: json['description'],
           organizer: json['organizer'],
+          venue: json['venue'],
           status: json['status'],
           id: json['id'],
         );

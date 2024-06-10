@@ -34,6 +34,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _organizerController = TextEditingController();
+  final _venueController = TextEditingController();
   final _searchController = TextEditingController();
 
   @override
@@ -46,6 +47,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
     _nameController.dispose();
     _descriptionController.dispose();
     _organizerController.dispose();
+    _venueController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -110,6 +112,25 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
           prefixIcon: Icon(Icons.person, color: Colors.purple,),
           contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: "Organizer",
+          hintStyle: TextStyle(color: Colors.purple),
+          border: InputBorder.none,
+        ),
+        style: const TextStyle(color: Colors.purple)
+      ),
+    );
+    final venueField = Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.purple),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: TextFormField(
+        autofocus: false,
+        controller: _venueController,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(Icons.person, color: Colors.purple,),
+          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: "Venue",
           hintStyle: TextStyle(color: Colors.purple),
           border: InputBorder.none,
         ),
@@ -274,13 +295,14 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
           if (_nameController.text.isNotEmpty &&
               _club != null &&
               _status != null &&
-              _organizerController.text.isNotEmpty) {
+              _organizerController.text.isNotEmpty && _venueController.text.isNotEmpty) {
             Event event = Event(
               name: _nameController.text,
               club: _club!,
               status: _status!,
               description: _descriptionController.text,
               organizer: _organizerController.text,
+              venue: _venueController.text,
               time: time,
             );
 
@@ -293,6 +315,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
                 status: _status!,
                 description: _descriptionController.text,
                 organizer: _organizerController.text,
+                venue: _venueController.text,
                 time: time,
                 id: _editEventId,
               ));
@@ -305,15 +328,13 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
               _nameController.clear();
               _descriptionController.clear();
               _organizerController.clear();
+              _venueController.clear();
               _club = null;
               _status = null;
               time = DateTime.now();
             });
           } else {
             log("Please enter all fields!");
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   const SnackBar(content: Text("Please enter all fields!")),
-            // );
             showErrorDialog(context, "Please enter all fields!");
           }
         },
@@ -350,6 +371,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
         _status = event.status;
         _descriptionController.text = event.description;
         _organizerController.text = event.organizer;
+        _venueController.text = event.venue;
         time = event.time;
         _editForm = true;
         _editEventId = event.id!;
@@ -412,6 +434,8 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
                   datePicker,
                   btnShowDate,
                   const SizedBox(height: 60.0),
+                  venueField,
+                  const SizedBox(height: 60.0),
                   btnSubmit,
                   const SizedBox(height: 20.0),
                   Row(
@@ -442,6 +466,7 @@ Future<void> bookSession({required Event event}) async {
     club: event.club,
     description: event.description,
     organizer: event.organizer,
+    venue: event.venue,
     status: event.status,
     id: docRef.id,
   );

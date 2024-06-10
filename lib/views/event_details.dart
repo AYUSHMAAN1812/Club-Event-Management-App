@@ -25,6 +25,7 @@ class _EventDetailsState extends State<EventDetails> {
       club: widget.event.club,
       description: widget.event.description,
       organizer: widget.event.organizer,
+      venue: widget.event.venue,
       status: widget.event.status,
       id: widget.event.id,
     );
