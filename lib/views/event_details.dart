@@ -45,7 +45,7 @@ class _EventDetailsState extends State<EventDetails> {
 
 
     return Scaffold(
-      backgroundColor: Colors.purple.shade100,
+      backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: Colors.purple,

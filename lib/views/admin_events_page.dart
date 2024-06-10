@@ -240,7 +240,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
         Center(child: Text("Book Event", style: TextStyle(color: Colors.white,fontSize: 24.0)));
 
     final btnShowDate = Material(
-      color: Colors.purple.shade100,
+      color: Colors.purple.shade50,
       child: MaterialButton(
         padding: EdgeInsets.zero,
         onPressed: () {
@@ -358,7 +358,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.purple.shade100,
+      backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: Colors.purple,

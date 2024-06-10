@@ -21,7 +21,7 @@ class _UserEventsPage extends State<UserEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple.shade100,
+      backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: Colors.purple,

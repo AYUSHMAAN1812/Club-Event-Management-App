@@ -51,7 +51,7 @@ class _LoginUserViewState extends State<LoginUserView> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.purple.shade100,
+        backgroundColor: Colors.purple.shade50,
         appBar: AppBar(
           // title: const Text('Login as User'),
           backgroundColor: Colors.purple,
@@ -137,7 +137,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                               final user = AuthService.firebase().currentUser;
                               if (user?.isEmailVerified ?? false) {
                                 // user's email is verified
-
+                                  initializeUserToken(email);
                                 if (!context.mounted) return;
                                 Navigator.of(context)
                                     .pushNamed(userEventsRoute);

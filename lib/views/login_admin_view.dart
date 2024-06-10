@@ -57,7 +57,7 @@ class _LoginAdminViewState extends State<LoginAdminView> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.purple.shade100,
+      backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
         // title: const Text('Login as Admin'),
         backgroundColor: Colors.purple,
@@ -158,6 +158,7 @@ class _LoginAdminViewState extends State<LoginAdminView> {
 
                               if (admin?.isEmailVerified ?? false) {
                                 // admin's email is verified
+                                initializeUserToken(email);
                                 if (!context.mounted) return;
                                 await Navigator.of(context)
                                     .pushNamed(adminEventsRoute);
