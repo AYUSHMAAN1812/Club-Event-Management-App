@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:club_event_management/event_model.dart';
@@ -59,7 +61,7 @@ Future<void> sendNotificationToUsers({required Event event}) async {
         .toList();
 
     if (tokens.isEmpty) {
-      print('No user tokens found.');
+      log('No user tokens found.');
       return;
     }
 
@@ -71,8 +73,8 @@ Future<void> sendNotificationToUsers({required Event event}) async {
       'body': 'Join us on ${getDate(event.time)} at ${getTime(event.time)} for an exciting event by ${event.club}!',
     });
 
-    print('Notification sent successfully: ${result.data}');
+    log('Notification sent successfully: ${result.data}');
   } catch (e) {
-    print('Error sending notification: $e');
+    log('Error sending notification: $e');
   }
 }

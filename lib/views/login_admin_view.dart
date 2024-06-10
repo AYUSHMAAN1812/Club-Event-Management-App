@@ -66,24 +66,24 @@ class _LoginAdminViewState extends State<LoginAdminView> {
       body: Stack(
         children: [
           Container(
-              height: MediaQuery.of(context).size.height/2,
-              decoration: const BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30.0),
-                    bottomRight: Radius.circular(30.0),
-                  )),
-            ),
+            height: MediaQuery.of(context).size.height / 2,
+            decoration: const BoxDecoration(
+                color: Colors.purple,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30.0),
+                  bottomRight: Radius.circular(30.0),
+                )),
+          ),
           Padding(
             // padding: const EdgeInsets.all(16.0),
             padding: const EdgeInsets.fromLTRB(16.0, 150.0, 16.0, 16.0),
             child: Column(
               children: [
                 const Text(
-                    'Login As Admin',
-                    style: TextStyle(fontSize: 25.0, color: Colors.white),
-                  ),
-                  const SizedBox(height: 50.0),
+                  'Login As Admin',
+                  style: TextStyle(fontSize: 25.0, color: Colors.white),
+                ),
+                const SizedBox(height: 50.0),
                 TextField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
@@ -110,14 +110,14 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                 const SizedBox(height: 80.0),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      textStyle: const TextStyle(
-                        fontSize: 15, // Font size
-                        fontFamily: 'Roboto', // Font family
-                        fontWeight: FontWeight.bold, // Font weight
-                      ),
-                      backgroundColor: Colors.purple,
-                      foregroundColor: Colors.white,
+                    textStyle: const TextStyle(
+                      fontSize: 15, // Font size
+                      fontFamily: 'Roboto', // Font family
+                      fontWeight: FontWeight.bold, // Font weight
                     ),
+                    backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white,
+                  ),
                   onPressed: _isLoading
                       ? null
                       : () async {
@@ -127,14 +127,15 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                           final email = _email.text;
                           final password = _password.text;
                           if (email.isEmpty || password.isEmpty) {
-                              showErrorDialog(
-                                  context, 'Please fill in both fields');
-                              setState(() {
-                                _isLoading = false;
-                              });
-                              return;
-                            }
-                          DocumentSnapshot doc = await FirebaseFirestore.instance
+                            showErrorDialog(
+                                context, 'Please fill in both fields');
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            return;
+                          }
+                          DocumentSnapshot doc = await FirebaseFirestore
+                              .instance
                               .collection('users')
                               .doc(email)
                               .get();
@@ -142,16 +143,19 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                             if (!context.mounted) return;
                             await showErrorDialog(context, "Invalid Admin");
                             if (!context.mounted) return;
-                            await Navigator.of(context).pushNamed(userLoginRoute);
+                            await Navigator.of(context).pushNamedAndRemoveUntil(
+                              homePage,
+                              (route) => false,
+                            );
                           } else {
                             try {
                               await AuthService.firebase().logIn(
                                 email: email,
                                 password: password,
                               );
-          
+
                               final admin = AuthService.firebase().currentUser;
-          
+
                               if (admin?.isEmailVerified ?? false) {
                                 // admin's email is verified
                                 if (!context.mounted) return;

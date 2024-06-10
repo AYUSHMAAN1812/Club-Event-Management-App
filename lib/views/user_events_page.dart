@@ -111,7 +111,7 @@ class Schedule extends StatelessWidget {
 
             for (var doc in snapshot.data!.docs) {
               final event = Event.fromJson(doc.data() as Map<String, dynamic>);
-              print(event); // Debug log for each event
+              // print(event); // Debug log for each event
               events.add(event);
             }
             return SizedBox(
