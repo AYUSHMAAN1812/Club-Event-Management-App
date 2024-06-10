@@ -1,10 +1,9 @@
 import 'dart:developer';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
+import 'package:club_event_management/services/event/event_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class LoginUserView extends StatefulWidget {
@@ -35,11 +34,9 @@ class _LoginUserViewState extends State<LoginUserView> {
 
   Future<void> initializeUserToken(String email) async {
     try {
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = await MessagingService().getToken();
       if (token != null) {
-        await FirebaseFirestore.instance.collection('users').doc(email).set({
-          "user-token": token,
-        }, SetOptions(merge: true));
+        await FirestoreService().setUserToken(email, token,"user");
       }
     } catch (e) {
       if (!mounted) return;

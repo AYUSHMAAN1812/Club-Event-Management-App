@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:club_event_management/constants/routes.dart';
 import 'package:club_event_management/services/auth/auth_exceptions.dart';
 import 'package:club_event_management/services/auth/auth_service.dart';
+import 'package:club_event_management/services/event/event_service.dart';
 import 'package:club_event_management/utilities/show_error_dialog.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class LoginAdminView extends StatefulWidget {
@@ -33,14 +33,11 @@ class _LoginAdminViewState extends State<LoginAdminView> {
     super.dispose();
   }
 
-  Future<void> initializeUserToken(String email) async {
+  Future<void> initializeAdminToken(String email) async {
     try {
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = await MessagingService().getToken();
       if (token != null) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(email)
-            .set({"user-token": token}, SetOptions(merge: true));
+        await FirestoreService().setUserToken(email, token, "admin");
       }
     } catch (e) {
       if (!mounted) return;
@@ -48,18 +45,21 @@ class _LoginAdminViewState extends State<LoginAdminView> {
     }
   }
 
-//   Future<String> getUserRole() async {
-//   User? user = FirebaseAuth.instance.currentUser;
-//   DocumentSnapshot doc = await FirebaseFirestore.instance.collection('users').doc(user?.uid).get();
-//   return doc['role'];
-// }
+  Future<DocumentSnapshot> getUserDocument(String email) async {
+    try {
+      DocumentSnapshot doc = await FirestoreService().getUserDocument(email);
+      return doc;
+    } catch (e) {
+      throw Exception('Error fetching user document: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
-        // title: const Text('Login as Admin'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -68,14 +68,14 @@ class _LoginAdminViewState extends State<LoginAdminView> {
           Container(
             height: MediaQuery.of(context).size.height / 2,
             decoration: const BoxDecoration(
-                color: Colors.purple,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30.0),
-                  bottomRight: Radius.circular(30.0),
-                )),
+              color: Colors.purple,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30.0),
+                bottomRight: Radius.circular(30.0),
+              ),
+            ),
           ),
           Padding(
-            // padding: const EdgeInsets.all(16.0),
             padding: const EdgeInsets.fromLTRB(16.0, 150.0, 16.0, 16.0),
             child: Column(
               children: [
@@ -111,9 +111,9 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     textStyle: const TextStyle(
-                      fontSize: 15, // Font size
-                      fontFamily: 'Roboto', // Font family
-                      fontWeight: FontWeight.bold, // Font weight
+                      fontSize: 15,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold,
                     ),
                     backgroundColor: Colors.purple,
                     foregroundColor: Colors.white,
@@ -124,31 +124,29 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                           setState(() {
                             _isLoading = true;
                           });
+
                           final email = _email.text;
                           final password = _password.text;
+
                           if (email.isEmpty || password.isEmpty) {
-                            showErrorDialog(
-                                context, 'Please fill in both fields');
+                            showErrorDialog(context, 'Please fill in both fields');
                             setState(() {
                               _isLoading = false;
                             });
                             return;
                           }
-                          DocumentSnapshot doc = await FirebaseFirestore
-                              .instance
-                              .collection('users')
-                              .doc(email)
-                              .get();
-                          if (doc['role'].toString() == 'user') {
-                            if (!context.mounted) return;
-                            await showErrorDialog(context, "Invalid Admin");
-                            if (!context.mounted) return;
-                            await Navigator.of(context).pushNamedAndRemoveUntil(
-                              homePage,
-                              (route) => false,
-                            );
-                          } else {
-                            try {
+
+                          try {
+                            final doc = await getUserDocument(email);
+                            if (doc['role'] == 'user') {
+                              if (!context.mounted) return;
+                              await showErrorDialog(context, "Invalid Admin");
+                              if (!context.mounted) return;
+                              await Navigator.of(context).pushNamedAndRemoveUntil(
+                                homePage,
+                                (route) => false,
+                              );
+                            } else {
                               await AuthService.firebase().logIn(
                                 email: email,
                                 password: password,
@@ -157,47 +155,31 @@ class _LoginAdminViewState extends State<LoginAdminView> {
                               final admin = AuthService.firebase().currentUser;
 
                               if (admin?.isEmailVerified ?? false) {
-                                // admin's email is verified
-                                initializeUserToken(email);
+                                initializeAdminToken(email);
                                 if (!context.mounted) return;
-                                await Navigator.of(context)
-                                    .pushNamed(adminEventsRoute);
+                                await Navigator.of(context).pushNamed(adminEventsRoute);
                               } else {
-                                // admin's email is not verified
                                 if (!context.mounted) return;
-                                await Navigator.of(context)
-                                    .pushNamed(verifyEmailRoute);
+                                await Navigator.of(context).pushNamed(verifyEmailRoute);
                               }
-                            } on UserNotFoundAuthException {
-                              if (!context.mounted) return;
-                              await showErrorDialog(
-                                context,
-                                'User Not Found',
-                              );
-                            } on WrongPasswordAuthException {
-                              if (!context.mounted) return;
-                              await showErrorDialog(
-                                context,
-                                'Wrong Credentials',
-                              );
-                            } on GenericAuthException {
-                              if (!context.mounted) return;
-                              await showErrorDialog(
-                                context,
-                                'Authentication Error',
-                              );
-                            } catch (e) {
-                              log('Error: $e');
-                              if (!context.mounted) return;
-                              await showErrorDialog(
-                                context,
-                                'Error: $e',
-                              );
-                            } finally {
-                              setState(() {
-                                _isLoading = false;
-                              });
                             }
+                          } on UserNotFoundAuthException {
+                            if (!context.mounted) return;
+                            await showErrorDialog(context, 'User Not Found');
+                          } on WrongPasswordAuthException {
+                            if (!context.mounted) return;
+                            await showErrorDialog(context, 'Wrong Credentials');
+                          } on GenericAuthException {
+                            if (!context.mounted) return;
+                            await showErrorDialog(context, 'Authentication Error');
+                          } catch (e) {
+                            log('Error: $e');
+                            if (!context.mounted) return;
+                            await showErrorDialog(context, 'Error: $e');
+                          } finally {
+                            setState(() {
+                              _isLoading = false;
+                            });
                           }
                         },
                   child: _isLoading
