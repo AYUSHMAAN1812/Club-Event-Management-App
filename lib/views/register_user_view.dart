@@ -36,7 +36,7 @@ class _RegisterViewState extends State<RegisterView> {
     try {
       final token = await MessagingService().getToken();
       if (token != null) {
-        await FirestoreService().setUserToken(email, token,"user");
+        await FirestoreService().setUserToken(email, token, "user");
       }
     } catch (e) {
       if (!mounted) return;
@@ -47,101 +47,144 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.purple.shade50,
       appBar: AppBar(
         title: const Text('Register'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _email,
-              keyboardType: TextInputType.emailAddress,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: "Enter your email here",
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: "Enter your password here",
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _isLoading
-                  ? null
-                  : () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
+      body: Stack(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height / 2,
+            decoration: const BoxDecoration(
+                color: Colors.purple,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30.0),
+                  bottomRight: Radius.circular(30.0),
+                )),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 150.0, 16.0, 16.0),
+            child: Column(
+              children: [
+                const Text(
+                  'Register As User',
+                  style: TextStyle(fontSize: 25.0, color: Colors.white),
+                ),
+                const SizedBox(height: 50.0),
+                TextField(
+                  controller: _email,
+                  keyboardType: TextInputType.emailAddress,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    hintText: "Enter your email here",
+                    hintStyle: TextStyle(color: Colors.white),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 16.0),
+                TextField(
+                  controller: _password,
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    hintText: "Enter your password here",
+                    hintStyle: TextStyle(color: Colors.white),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 80.0),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    textStyle: const TextStyle(
+                      fontSize: 15, // Font size
+                      fontFamily: 'Roboto', // Font family
+                      fontWeight: FontWeight.bold, // Font weight
+                    ),
+                    backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isLoading = true;
+                          });
 
-                      final email = _email.text;
-                      final password = _password.text;
+                          final email = _email.text;
+                          final password = _password.text;
 
-                      if (email.isEmpty || password.isEmpty) {
-                        showErrorDialog(context, 'Please fill in both fields');
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        return;
-                      }
+                          if (email.isEmpty || password.isEmpty) {
+                            showErrorDialog(
+                                context, 'Please fill in both fields');
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            return;
+                          }
 
-                      try {
-                        await AuthService.firebase().createUser(
-                          email: email,
-                          password: password,
-                        );
+                          try {
+                            await AuthService.firebase().createUser(
+                              email: email,
+                              password: password,
+                            );
 
-                        final user = AuthService.firebase().currentUser;
-                        if (user?.isEmailVerified ?? false) {
-                          if (!context.mounted) return;
-                          Navigator.of(context).pushNamed(userEventsRoute);
-                        } else {
-                          await initializeUserToken(email);
-                          if (!context.mounted) return;
-                          Navigator.of(context).pushNamed(verifyEmailRoute);
-                        }
-                      } on WeakPasswordAuthException {
-                        showErrorDialog(context, 'Weak Password');
-                      } on EmailAlreadyInUseAuthException {
-                        showErrorDialog(context, 'Email is already in use');
-                      } on InvalidEmailAuthException {
-                        showErrorDialog(context, 'Invalid Email');
-                      } on GenericAuthException {
-                        showErrorDialog(context, 'Failed To Register');
-                      } catch (e) {
-                        log('Error: $e');
-                        if (!context.mounted) return;
-                        showErrorDialog(context, 'Error: $e');
-                      } finally {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      }
-                    },
-              child: _isLoading
-                  ? const CircularProgressIndicator(
-                      color: Colors.white,
-                    )
-                  : const Text('Register'),
+                            final user = AuthService.firebase().currentUser;
+                            if (user?.isEmailVerified ?? false) {
+                              if (!context.mounted) return;
+                              Navigator.of(context).pushNamed(userEventsRoute);
+                            } else {
+                              await initializeUserToken(email);
+                              if (!context.mounted) return;
+                              Navigator.of(context).pushNamed(verifyEmailRoute);
+                            }
+                          } on WeakPasswordAuthException {
+                            showErrorDialog(context, 'Weak Password');
+                          } on EmailAlreadyInUseAuthException {
+                            showErrorDialog(context, 'Email is already in use');
+                          } on InvalidEmailAuthException {
+                            showErrorDialog(context, 'Invalid Email');
+                          } on GenericAuthException {
+                            showErrorDialog(context, 'Failed To Register');
+                          } catch (e) {
+                            log('Error: $e');
+                            if (!context.mounted) return;
+                            showErrorDialog(context, 'Error: $e');
+                          } finally {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          }
+                        },
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text('Register'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    textStyle: const TextStyle(
+                      fontSize: 15, // Font size
+                      fontFamily: 'Roboto', // Font family
+                      fontWeight: FontWeight.bold, // Font weight
+                    ),
+                    backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(userLoginRoute);
+                  },
+                  child: const Text("Already registered? Login here"),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(userLoginRoute);
-              },
-              child: const Text("Already registered? Login here"),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

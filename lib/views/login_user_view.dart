@@ -134,7 +134,7 @@ class _LoginUserViewState extends State<LoginUserView> {
                               final user = AuthService.firebase().currentUser;
                               if (user?.isEmailVerified ?? false) {
                                 // user's email is verified
-                                  initializeUserToken(email);
+                                  await initializeUserToken(email);
                                 if (!context.mounted) return;
                                 Navigator.of(context)
                                     .pushNamed(userEventsRoute);
