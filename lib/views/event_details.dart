@@ -87,6 +87,7 @@ class _EventDetailsState extends State<EventDetails> {
               BuildRow(title: "Organizer", details: widget.event.organizer),
               BuildRow(title: "Date", details: getDate(widget.event.time)),
               BuildRow(title: "Time", details: getTime(widget.event.time)),
+              BuildRow(title: "Venue", details: widget.event.venue),
               BuildRow(title: "Status", details: _eventCopy.status),
               const SizedBox(height: 20.0),
               

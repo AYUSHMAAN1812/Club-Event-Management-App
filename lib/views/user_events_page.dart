@@ -198,7 +198,12 @@ class ScheduleCard extends StatelessWidget {
                             Text(checkDate(event.time)),
 
                             //Event time
-                            Text(getTime(event.time)),
+                            Column(
+                              children: [
+                                Text(getTime(event.time)),
+                                Text(event.venue),
+                              ],
+                            ),
                           ]),
                       
                     ],
